@@ -2,12 +2,13 @@ package com.weareadaptive.auctionhouse.console.admin;
 
 import com.weareadaptive.auctionhouse.console.ConsoleMenu;
 import com.weareadaptive.auctionhouse.console.MenuContext;
+import com.weareadaptive.auctionhouse.model.AccessStatus;
 import com.weareadaptive.auctionhouse.model.OrganisationDetails;
 import com.weareadaptive.auctionhouse.model.User;
+import com.weareadaptive.auctionhouse.utils.StringUtil;
 
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static com.weareadaptive.auctionhouse.utils.PromptUtil.*;
 
@@ -28,18 +29,12 @@ public class UserManagementMenu extends ConsoleMenu {
 
     private void changeUserAccess(final MenuContext context) {
         var out = context.getOut();
-        listUsers(context);
+        printAllUsers(context);
 
         var user = getUser(context);
         if (user.isEmpty()) {
             out.println(terminatedOperationText);
             return;
-        }
-
-        if (user.get().hasAccess()) {
-            out.println("This user has access.");
-        } else {
-            out.println("This user does not have access");
         }
 
         do {
@@ -50,8 +45,8 @@ public class UserManagementMenu extends ConsoleMenu {
             }
 
             switch (input.toLowerCase()) {
-                case "block" -> user.get().setHasAccess(false);
-                case "allow" -> user.get().setHasAccess(true);
+                case "block" -> user.get().setAccessStatus(AccessStatus.BLOCKED);
+                case "allow" -> user.get().setAccessStatus(AccessStatus.ALLOWED);
                 default -> out.println(invalidInputMessage);
             }
             break;
@@ -70,38 +65,38 @@ public class UserManagementMenu extends ConsoleMenu {
 
     private void updateExistingUser(final MenuContext context) {
         final var out = context.getOut();
-        final var userState = context.getState().userState();
         final var user = getUser(context);
         if (user.isEmpty()) {
             out.println(terminatedOperationText);
             return;
         }
 
-        final var id = user.get().getId();
-        final String fName = getStringOrEmptyInput(context, "What is new first name?").orElse(user.get().getFirstName());
-        final String lName = getStringOrEmptyInput(context, "What is new last name?").orElse(user.get().getLastName());
         final String uName = promptForUsername(context);
-        final String organisation = getStringOrEmptyInput(context, "What is the user's new organisation?").orElse(user.get().getOrganisation());
+        final String fName = getStringOrEmptyInput(context, "What is new first name?").orElse(user.get().getFirstName());
         final String password = getPassword(context);
+        final String lName = getStringOrEmptyInput(context, "What is new last name?").orElse(user.get().getLastName());
+        final String organisation = getStringOrEmptyInput(context, "What is the user's new organisation?").orElse(user.get().getOrganisation());
 
-        userState.updateUser(id, new User(id, uName, password, fName, lName, organisation));
+        user.get().update(uName, password, fName, lName, organisation);
         out.println("User updated.");
         pressEnter(context);
     }
 
     private Optional<User> getUser(final MenuContext context) {
-        var state = context.getState().userState();
-        var out = context.getOut();
+        final var state = context.getState().userState();
+        final var out = context.getOut();
         do {
-            var userId = getIntegerInput(context, "Please input the user's id.");
-            var user = state.get(userId);
-            if (user == null) {
-                out.println("User does not exist. Please try again or input -1 to quit.");
-                continue;
-            } else if (userId == -1) {
+            final var uName = getStringInput(context, "Please choose a user by entering their username.");
+
+            if (StringUtil.isNullOrEmpty(uName)) {
                 return Optional.empty();
             }
-            return Optional.of(user);
+
+            if (!state.containsUser(uName)) {
+                out.println("User does not exist. Please try again or input Q to quit.");
+                continue;
+            }
+            return state.stream().filter(u->u.getUsername().equals(uName)).findFirst();
         } while (true);
     }
 

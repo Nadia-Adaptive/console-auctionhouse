@@ -4,15 +4,13 @@ import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
 
 public class User implements Model {
     private final int id;
-    private final String username;
-    private final String password;
-    private final String firstName;
-    private final String lastName;
-    private final String organisation;
+    private String username;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private String organisation;
     private final boolean isAdmin;
-    private boolean hasAccess;
-
-
+    private AccessStatus accessStatus;
 
     public User(int id, String username, String password, String firstName, String lastName,
                 String organisation) {
@@ -43,7 +41,7 @@ public class User implements Model {
         this.lastName = lastName;
         this.organisation = organisation;
         this.isAdmin = isAdmin;
-        this.hasAccess = false;
+        this.accessStatus = AccessStatus.ALLOWED;
     }
 
     public String getUsername() {
@@ -73,11 +71,20 @@ public class User implements Model {
     public boolean isAdmin() {
         return isAdmin;
     }
-    public boolean hasAccess() {
-        return hasAccess;
+
+    public AccessStatus getAccessStatus() {
+        return accessStatus;
     }
 
-    public void setHasAccess(boolean hasAccess) {
-        this.hasAccess = hasAccess;
+    public void setAccessStatus(AccessStatus accessStatus) {
+        this.accessStatus = accessStatus;
+    }
+
+    public void update(String username, String password, String firstName, String lastName, String organisation) {
+        this.username = isNullOrEmpty(username) ? this.username : username;
+        this.password = isNullOrEmpty(password) ? this.password : password;
+        this.firstName = isNullOrEmpty(firstName) ? this.firstName : firstName;
+        this.lastName = isNullOrEmpty(lastName) ? this.lastName : lastName;
+        this.organisation = isNullOrEmpty(organisation) ? this.organisation : organisation;
     }
 }
