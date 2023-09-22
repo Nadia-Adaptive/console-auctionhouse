@@ -1,5 +1,7 @@
 package com.weareadaptive.auctionhouse.model;
 
+import java.util.Objects;
+
 import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
 
 public class User implements Model {
@@ -78,6 +80,20 @@ public class User implements Model {
 
     public void setAccessStatus(AccessStatus accessStatus) {
         this.accessStatus = accessStatus;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return getId() == user.getId() && getUsername().equals(user.getUsername());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getUsername());
     }
 
     public void update(String username, String password, String firstName, String lastName, String organisation) {

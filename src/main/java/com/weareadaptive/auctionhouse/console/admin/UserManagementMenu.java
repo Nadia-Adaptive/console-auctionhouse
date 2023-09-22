@@ -13,7 +13,6 @@ import java.util.Optional;
 import static com.weareadaptive.auctionhouse.utils.PromptUtil.*;
 
 public class UserManagementMenu extends ConsoleMenu {
-
     @Override
     public void display(final MenuContext context) {
         createMenu(context,
@@ -54,11 +53,11 @@ public class UserManagementMenu extends ConsoleMenu {
     }
 
     private User createNewUser(final MenuContext context, final int id) {
+        String uName = promptForUsername(context);
+        String password = getPassword(context);
         String fName = getStringInput(context, "What is the user's first name?");
         String lName = getStringInput(context, "What is the user's last name?");
-        String uName = promptForUsername(context);
         String organisation = getStringInput(context, "Where does the user work?");
-        String password = getPassword(context);
 
         return new User(id, uName, password, fName, lName, organisation);
     }
