@@ -52,16 +52,6 @@ public class UserManagementMenu extends ConsoleMenu {
         } while (true);
     }
 
-    private User createNewUser(final MenuContext context, final int id) {
-        String uName = promptForUsername(context);
-        String password = getPassword(context);
-        String fName = getStringInput(context, "What is the user's first name?");
-        String lName = getStringInput(context, "What is the user's last name?");
-        String organisation = getStringInput(context, "Where does the user work?");
-
-        return new User(id, uName, password, fName, lName, organisation);
-    }
-
     private void updateExistingUser(final MenuContext context) {
         final var out = context.getOut();
         final var user = getUser(context);
@@ -95,7 +85,7 @@ public class UserManagementMenu extends ConsoleMenu {
                 out.println("User does not exist. Please try again or input Q to quit.");
                 continue;
             }
-            return state.stream().filter(u->u.getUsername().equals(uName)).findFirst();
+            return state.stream().filter(u -> u.getUsername().equals(uName)).findFirst();
         } while (true);
     }
 
@@ -104,7 +94,37 @@ public class UserManagementMenu extends ConsoleMenu {
         var orgState = context.getState().orgState();
         var out = context.getOut();
 
-        var newUser = createNewUser(context, userState.nextId());
+        String uName = promptForUsername(context);
+        if(hasUserTerminatedOperation(uName)){
+            out.println(terminatedOperationText);
+            return;
+        }
+
+        String password = getPassword(context);
+        if(hasUserTerminatedOperation(password)){
+            out.println(terminatedOperationText);
+            return;
+        }
+
+        String fName = getStringInput(context, "What is the user's first name?");
+        if(hasUserTerminatedOperation(fName)){
+            out.println(terminatedOperationText);
+            return;
+        }
+
+        String lName = getStringInput(context, "What is the user's last name?");
+        if(hasUserTerminatedOperation(lName)){
+            out.println(terminatedOperationText);
+            return;
+        }
+
+        final String organisation = getStringInput(context, "Where does the user work?");
+        if(hasUserTerminatedOperation(organisation)){
+            out.println(terminatedOperationText);
+            return;
+        }
+
+        final var newUser = new User(userState.nextId(), uName, password, fName, lName, organisation);
 
         out.printf("Created new user %s%n", newUser.getUsername());
         orgState.addUserToOrg(newUser);
@@ -114,15 +134,19 @@ public class UserManagementMenu extends ConsoleMenu {
     }
 
     private String getPassword(final MenuContext context) {
-        var out = context.getOut();
-        var scanner = context.getScanner();
+        final var out = context.getOut();
+        final var scanner = context.getScanner();
 
         do {
             out.println("Input the user's password: ");
-            var password = readPassword(scanner);
+            final var password = readPassword(scanner);
+
+            if(password.equalsIgnoreCase("q")){
+                return password;
+            }
 
             out.println("Confirm the user's password:");
-            var confirmPassword = readPassword(scanner);
+            final var confirmPassword = readPassword(scanner);
 
             if (confirmPassword.equals(password)) {
                 return password;
