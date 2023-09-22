@@ -146,9 +146,7 @@ public class UserManagementMenu extends ConsoleMenu {
             }
 
             out.println("Confirm the user's password:");
-            final var confirmPassword = readPassword(scanner);
-
-            if (confirmPassword.equals(password)) {
+            if (password.equals(readPassword(scanner))) {
                 return password;
             } else {
                 out.println("The passwords don't match. Please try again.");
