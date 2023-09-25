@@ -22,7 +22,7 @@ public class OrganisationStateTest {
     public void shouldCreateNewOrganisationDetailIfItDoesntExist() {
         final var initialOrganisationCount = state.getAllOrganisations().count();
         state.addUserToOrg(USER3);
-        assertNotEquals(initialOrganisationCount, 2);
+        assertNotEquals(2, initialOrganisationCount);
     }
 
     @Test
@@ -30,14 +30,14 @@ public class OrganisationStateTest {
     public void shouldNotCreateNewOrganisationDetailIfItExists() {
         final var initialOrganisationCount = state.getAllOrganisations().count();
         state.addUserToOrg(USER2);
-        assertEquals(initialOrganisationCount, 1);
+        assertEquals(1, initialOrganisationCount);
     }
 
     @Test
     @DisplayName("addUserToOrg should not create an organisation for admins")
-    public void shouldNotAddAdminToOrganisation() {
+    public void shouldNotCreateAdminOrganisation() {
         final var initialOrganisationCount = state.getAllOrganisations().count();
         state.addUserToOrg(ADMIN);
-        assertEquals(initialOrganisationCount, 1);
+        assertEquals(1, initialOrganisationCount);
     }
 }
