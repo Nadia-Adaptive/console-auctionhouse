@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.stream.Stream;
 
 import static com.weareadaptive.auctionhouse.TestData.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserStateTest {
     private UserState state;
@@ -42,4 +41,15 @@ public class UserStateTest {
         assertTrue(user.isEmpty());
     }
 
+    @Test
+    @DisplayName("containsUser should return true when user is present in state")
+    public void shouldReturnTrueWhenUserIsInState() {
+        assertTrue(state.containsUser("admin"));
+    }
+
+    @Test
+    @DisplayName("containsUser should return false when user is not present in state")
+    public void shouldReturnFalseWhenUserIsNotInState() {
+        assertFalse(state.containsUser("testuser7"));
+    }
 }
