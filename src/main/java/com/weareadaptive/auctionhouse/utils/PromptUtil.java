@@ -23,6 +23,9 @@ public class PromptUtil {
     public static Double getDoubleInput(final MenuContext context, final String prompt) {
         do {
             final var input = getStringInput(context, prompt);
+            if (hasUserTerminatedOperation(input)) {
+                return -1d;
+            }
             try {
                 return Double.parseDouble(input);
             } catch (NumberFormatException e) {
@@ -46,7 +49,7 @@ public class PromptUtil {
     }
 
     public static String getStringOrEmptyInput(final MenuContext context, final String prompt) {
-        var input = getStringInput(context, prompt + "\n"+ leaveFieldBlankText);
+        var input = getStringInput(context, prompt + "\n" + leaveFieldBlankText);
         if (hasUserTerminatedOperation(input)) {
             return "";
         }
@@ -56,9 +59,11 @@ public class PromptUtil {
     public static boolean hasUserTerminatedOperation(final String input) {
         return input.equalsIgnoreCase("q");
     }
+
     public static boolean hasUserTerminatedOperation(final double input) {
         return input == -1d;
     }
+
     public static boolean hasUserTerminatedOperation(final int input) {
         return input == -1;
     }
