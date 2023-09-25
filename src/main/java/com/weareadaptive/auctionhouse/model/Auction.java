@@ -2,6 +2,7 @@ package com.weareadaptive.auctionhouse.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
 
@@ -11,8 +12,10 @@ public class Auction implements Model {
     private final String symbol;
     private final double price;
     private final int quantity;
+    private final String seller;
+    private AuctionStatus auctionStatus;
 
-    public Auction(final int id, final String symbol, final double price, final int quantity) {
+    public Auction(final int id, final String seller, final String symbol, final double price, final int quantity) {
         if (isNullOrEmpty(symbol)) {
             throw new BusinessException("Symbol cannot be empty!");
         }
@@ -24,10 +27,12 @@ public class Auction implements Model {
         }
 
         this.id = id;
+        this.seller = seller;
         this.symbol = symbol;
         this.price = price;
         this.quantity = quantity;
         bids = new ArrayList<Bid>();
+        this.auctionStatus=AuctionStatus.OPEN;
     }
 
     @Override
@@ -45,5 +50,17 @@ public class Auction implements Model {
 
     public String getSymbol() {
         return symbol;
+    }
+
+    public String getSeller() {
+        return seller;
+    }
+
+    public AuctionStatus getStatus() {
+        return auctionStatus;
+    }
+
+    public Stream<Bid> getBids() {
+        return bids.stream();
     }
 }

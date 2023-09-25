@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Scanner;
 
+import static com.weareadaptive.auctionhouse.TestData.USER1;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,7 +19,7 @@ public class AuctionManagementMenuTest {
         final AuctionManagementMenu menu = new AuctionManagementMenu();
         Scanner scanner = new Scanner(src);
         MenuContext context = new MenuContext(new ModelState(new UserState(), new OrganisationState(), new AuctionState()), scanner, System.out);
-        context.getState().userState().nextId();
+        context.setCurrentUser(USER1);
 
         menu.display(context);
 

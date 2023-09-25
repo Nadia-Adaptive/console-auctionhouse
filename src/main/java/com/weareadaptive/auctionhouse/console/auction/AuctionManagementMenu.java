@@ -44,15 +44,28 @@ public class AuctionManagementMenu extends ConsoleMenu {
             return;
         }
 
-        final var newAuction = new Auction(auctionState.nextId(), symbol, price, quantity);
+        final var newAuction = new Auction(auctionState.nextId(), user.getUsername(), symbol, price, quantity);
 
-        out.printf("Created new auction.");
         auctionState.add(newAuction);
+        out.println("Created new auction.");
 
         pressEnter(context);
     }
 
     private void listUserAuctions(MenuContext context) {
+        final var out = context.getOut();
+        final var allAuctions = context.getState().auctionState().getUserAuctions(context.getCurrentUser().getUsername());
+
+        out.println("=> Your Auctions");
+        out.println("======================");
+
+        allAuctions.forEach(a -> out.println("Id: %d%nSymbol: %s%nStatus: %s%nAll Bids: %s%n".formatted(
+                a.getId(),
+                a.getSymbol(),
+                a.getStatus().toString(),
+                a.getBids().map(b -> b.toString()).reduce((String acc, String val) ->
+                        String.join("%n", acc, val)
+                ))));
 
     }
 
