@@ -1,17 +1,16 @@
 package com.weareadaptive.auctionhouse.console;
 
-import java.util.List;
+import com.weareadaptive.auctionhouse.model.*;
+
 import java.util.Scanner;
 import java.util.stream.Stream;
-
-import com.weareadaptive.auctionhouse.model.*;
 
 
 public class ConsoleAuction {
     private final MenuContext menuContext;
 
     public ConsoleAuction() {
-        var state = new ModelState(new UserState(), new OrganisationState());
+        var state = new ModelState(new UserState(), new OrganisationState(), new AuctionState());
         initData(state);
         var scanner = new Scanner(System.in);
         menuContext = new MenuContext(state, scanner, System.out);
@@ -26,7 +25,7 @@ public class ConsoleAuction {
                 )
                 .forEach(u -> {
                     state.userState().add(u);
-                    state.orgState().addUserToOrg(u);
+                    state.organisationState().addUserToOrg(u);
                 });
     }
 

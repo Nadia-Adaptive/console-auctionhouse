@@ -1,6 +1,7 @@
 package com.weareadaptive.auctionhouse.console.admin;
 
 import com.weareadaptive.auctionhouse.console.MenuContext;
+import com.weareadaptive.auctionhouse.model.AuctionState;
 import com.weareadaptive.auctionhouse.model.ModelState;
 import com.weareadaptive.auctionhouse.model.OrganisationState;
 import com.weareadaptive.auctionhouse.model.UserState;
@@ -48,7 +49,7 @@ public class UserManagementMenuTest {
     private MenuContext createUserContext(final String src) {
         final UserManagementMenu menu = new UserManagementMenu();
         Scanner scanner = new Scanner(src);
-        MenuContext context = new MenuContext(new ModelState(new UserState(), new OrganisationState()), scanner, System.out);
+        MenuContext context = new MenuContext(new ModelState(new UserState(), new OrganisationState(), new AuctionState()), scanner, System.out);
         context.getState().userState().nextId();
 
         menu.display(context);

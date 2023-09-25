@@ -66,9 +66,9 @@ public class UserManagementMenu extends ConsoleMenu {
             return;
         }
 
-        final String uName = getUsername(context, "What is the new username?\n%s".formatted(leaveFieldBlank));
+        final String uName = getUsername(context, "What is the new username?\n%s".formatted(leaveFieldBlankText));
         final String fName = getStringOrEmptyInput(context, "What is the new first name?");
-        final String password = getPassword(context, "What is the new password?\n%s".formatted(leaveFieldBlank));
+        final String password = getPassword(context, "What is the new password?\n%s".formatted(leaveFieldBlankText));
         final String lName = getStringOrEmptyInput(context, "What is new last name?");
         final String organisation = getStringOrEmptyInput(context, "What is the user's new organisation?");
         final String oldOrganisation = user.get().getOrganisation();
@@ -77,7 +77,7 @@ public class UserManagementMenu extends ConsoleMenu {
         user.get().update(hasUserTerminatedOperation(uName) ? "" : uName, password, fName, lName, organisation);
 
         if (!isNullOrEmpty(organisation) && user.get().getOrganisation() != oldOrganisation) {
-            context.getState().orgState().updateOrganisation(user.get(), oldOrganisation);
+            context.getState().organisationState().updateOrganisation(user.get(), oldOrganisation);
         }
 
         out.println("User updated.");
@@ -104,7 +104,7 @@ public class UserManagementMenu extends ConsoleMenu {
 
     private void createNewUser(final MenuContext context) {
         var userState = context.getState().userState();
-        var orgState = context.getState().orgState();
+        var orgState = context.getState().organisationState();
         var out = context.getOut();
 
         out.println(cancelOperationText);
@@ -184,7 +184,7 @@ public class UserManagementMenu extends ConsoleMenu {
 
     private void listOrganisationsDetails(final MenuContext context) {
         var out = context.getOut();
-        var orgState = context.getState().orgState();
+        var orgState = context.getState().organisationState();
 
         out.println("== Organisation details");
         orgState.getAllDetails()
@@ -202,7 +202,7 @@ public class UserManagementMenu extends ConsoleMenu {
 
     private void listOrganisations(final MenuContext context) {
         var out = context.getOut();
-        var orgState = context.getState().orgState();
+        var orgState = context.getState().organisationState();
 
         out.println("== All organisations");
         orgState.getAllOrganisations().sorted().forEach(out::println);
