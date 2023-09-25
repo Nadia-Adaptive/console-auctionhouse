@@ -80,4 +80,14 @@ public class PromptUtilTest {
         final var userInt = getIntegerInput(context, "Text");
         assertEquals(1, userInt);
     }
+
+    @Test
+    @DisplayName("getDoubleInput should loop if negative values are entered")
+    public void shouldLoopIfNegativeDoubleValuesEntered() {
+        Scanner scanner = new Scanner("-10.8\n-0.1\n-8.9\n0.01");
+        MenuContext context = new MenuContext(null, scanner, System.out);
+
+        final var userInt = getDoubleInput(context, "Text");
+        assertEquals(0.01, userInt);
+    }
 }
