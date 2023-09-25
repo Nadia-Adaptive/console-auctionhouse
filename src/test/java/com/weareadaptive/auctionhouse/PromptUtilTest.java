@@ -53,11 +53,21 @@ public class PromptUtilTest {
 
     @Test
     @DisplayName("should return false when user inputs q instead of a double")
-    public void shouldReturnFalseWhenUserInputsInsteadOfDouble() {
+    public void shouldReturnFalseWhenUserInputsQInsteadOfDouble() {
         Scanner scanner = new Scanner("q");
         MenuContext context = new MenuContext(null, scanner, System.out);
 
         final var userDouble = getDoubleInput(context, "Text");
         assertTrue(hasUserTerminatedOperation(userDouble));
+    }
+
+    @Test
+    @DisplayName("should return false when user inputs q instead of an int")
+    public void shouldReturnFalseWhenUserInputsQInsteadOfInt() {
+        Scanner scanner = new Scanner("q");
+        MenuContext context = new MenuContext(null, scanner, System.out);
+
+        final var userInt = getIntegerInput(context, "Text");
+        assertTrue(hasUserTerminatedOperation(userInt));
     }
 }

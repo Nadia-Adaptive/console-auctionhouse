@@ -12,8 +12,12 @@ public class PromptUtil {
 
     public static int getIntegerInput(final MenuContext context, final String prompt) {
         do {
+            final var input = getStringInput(context, prompt);
+            if (hasUserTerminatedOperation(input)) {
+                return -1;
+            }
             try {
-                return Integer.parseInt(getStringInput(context, prompt));
+                return Integer.parseInt(input);
             } catch (NumberFormatException e) {
                 context.getOut().println(invalidNumberText);
             }
