@@ -2,6 +2,7 @@ package com.weareadaptive.auctionhouse.console;
 
 import com.weareadaptive.auctionhouse.console.admin.UserManagementMenu;
 import com.weareadaptive.auctionhouse.console.auction.AuctionManagementMenu;
+import com.weareadaptive.auctionhouse.model.AccessStatus;
 
 public class LoginMenu extends ConsoleMenu {
 
@@ -37,8 +38,12 @@ public class LoginMenu extends ConsoleMenu {
                 .findUserByUsername(username, password)
                 .ifPresentOrElse(user -> {
                     context.setCurrentUser(user);
-                    out.printf("Welcome %s %s %n", user.getFirstName(), user.getLastName());
-                    ManagementMenu(context);
+                    if (user.getAccessStatus() == AccessStatus.ALLOWED) {
+                        out.printf("Welcome %s %s %n", user.getFirstName(), user.getLastName());
+                        ManagementMenu(context);
+                    } else {
+                        out.println("You are not authorized. Please contact support.");
+                    }
                 }, () -> out.println("Invalid username/password combination"));
     }
 
@@ -57,6 +62,5 @@ public class LoginMenu extends ConsoleMenu {
 
     private void auctionManagementMenu(MenuContext context) {
         auctionMenu.display(context);
-        context.getOut().println("You have accessed the auction management menu");
     }
 }

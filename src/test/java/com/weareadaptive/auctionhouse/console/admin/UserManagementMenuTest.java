@@ -74,8 +74,26 @@ public class UserManagementMenuTest {
         assertTrue(context.getState().userState().stream().findAny().get().equals(USER1));
     }
 
+    @Test
+    @DisplayName("Update User details operation should change an existing user's details with valid parameters")
+    public void updateUserShouldModifyExistingUser() {
+        final var password = "PASSWORD";
+        final MenuContext context = createUserContext("%d\n%s\n%s\n%s\n%s\n%s\n%s\n\r\n7".formatted(
+                1,
+                USER1.getUsername(),
+                password,
+                password,
+                USER1.getFirstName(),
+                USER1.getLastName(),
+                USER1.getOrganisation()
+        ));
+
+
+        assertTrue(context.getState().userState().stream().findAny().get().equals(USER1));
+    }
+
     @ParameterizedTest
-    @DisplayName("Create User operation should terminate if user enters Q at any stage")
+    @DisplayName("Update User details operation should terminate if user enters Q at any stage")
     @MethodSource("testArguments") // TODO: Look this up
     public void createUserShouldTerminatesOnUserRequest(final String src) {
         //Assert

@@ -45,7 +45,7 @@ public abstract class ConsoleMenu {
         }
       }
       out.println("===================================");
-      out.print("Enter your option: ");
+      out.println("Enter your option: ");
       var invalidOption = false;
       try {
         var rawOption = scanner.nextLine();
