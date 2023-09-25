@@ -10,6 +10,8 @@ public class PromptUtil {
 
     public static final String invalidNumberText = "Invalid number. Please try again.";
 
+
+    // TODO: See if you can make this and getDoubleInput generic
     public static int getIntegerInput(final MenuContext context, final String prompt) {
         do {
             final var input = getStringInput(context, prompt);
