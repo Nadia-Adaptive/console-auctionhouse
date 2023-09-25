@@ -9,6 +9,7 @@ public class PromptUtil {
     public static final String leaveFieldBlankText = "If you wish to leave this field as is, please input Q.";
 
     public static final String invalidNumberText = "Invalid number. Please try again.";
+    public static final String nonZeroOrNegativeText = "Number must be greater than 0. Please try again.";
 
 
     // TODO: See if you can make this and getDoubleInput generic
@@ -19,10 +20,14 @@ public class PromptUtil {
                 return -1;
             }
             try {
-                return Integer.parseInt(input);
+                final var intInput = Integer.parseInt(input);
+                if (intInput > 0) {
+                    return intInput;
+                }
             } catch (NumberFormatException e) {
                 context.getOut().println(invalidNumberText);
             }
+            context.getOut().println(nonZeroOrNegativeText);
         } while (true);
     }
 
