@@ -27,7 +27,7 @@ public class AuctionManagementMenuTest {
     }
 
     @Test
-    @DisplayName("can create an auction through the menu")
+    @DisplayName("auctionManagementMenu can create an auction through the menu")
     public void canCreateAuction() {
         final var context = createAuctionContext("1\nEURUSD\n1.55\n1000\n\r7");
 

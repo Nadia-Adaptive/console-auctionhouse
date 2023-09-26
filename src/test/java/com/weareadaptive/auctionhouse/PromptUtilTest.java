@@ -90,4 +90,24 @@ public class PromptUtilTest {
         final var userInt = getDoubleInput(context, "Text");
         assertEquals(0.01, userInt);
     }
+
+    @Test
+    @DisplayName("getIntegerInput should return zero if allowZero is true")
+    public void shouldReturnZeroIntegerIfAllowZeroIsSetToTrue() {
+        Scanner scanner = new Scanner("0");
+        MenuContext context = new MenuContext(null, scanner, System.out);
+
+        final var userInt = getIntegerInput(context, "Text", true);
+        assertEquals(0, userInt);
+    }
+
+    @Test
+    @DisplayName("getIntegerInput should loop if allowZero is false")
+    public void shouldLoopIfAllowZeroIsSetToFalse() {
+        Scanner scanner = new Scanner("0\n1");
+        MenuContext context = new MenuContext(null, scanner, System.out);
+
+        final var userInt = getIntegerInput(context, "Text");
+        assertEquals(1, userInt);
+    }
 }

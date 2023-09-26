@@ -14,6 +14,9 @@ public class PromptUtil {
 
     // TODO: See if you can make this and getDoubleInput generic
     public static int getIntegerInput(final MenuContext context, final String prompt) {
+        return getIntegerInput(context, prompt, false);
+    }
+    public static int getIntegerInput(final MenuContext context, final String prompt, boolean allowZero) {
         do {
             final var input = getStringInput(context, prompt);
             if (hasUserTerminatedOperation(input)) {
@@ -21,7 +24,7 @@ public class PromptUtil {
             }
             try {
                 final var intInput = Integer.parseInt(input);
-                if (intInput > 0) {
+                if (intInput > 0 || (allowZero && intInput >= 0)) {
                     return intInput;
                 } else {
                     context.getOut().println(zeroOrNegativeText);

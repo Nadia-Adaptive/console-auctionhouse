@@ -1,6 +1,7 @@
 package com.weareadaptive.auctionhouse.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -32,7 +33,7 @@ public class Auction implements Model {
         this.price = price;
         this.quantity = quantity;
         bids = new ArrayList<Bid>();
-        this.auctionStatus=AuctionStatus.OPEN;
+        this.auctionStatus = AuctionStatus.OPEN;
     }
 
     @Override
@@ -62,5 +63,16 @@ public class Auction implements Model {
 
     public Stream<Bid> getBids() {
         return bids.stream();
+    }
+
+    public void makeBid(final String username, final double offer, final int quantity) {
+        if (offer <= 0) {
+            throw new BusinessException("Offer must be greater than zero.");
+        }
+        if (isNullOrEmpty(username)) {
+            throw new BusinessException("Username cannot be empty or null.");
+        }
+
+        bids.add(new Bid(offer, quantity, new Date(), username));
     }
 }
