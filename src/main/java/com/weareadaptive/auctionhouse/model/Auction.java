@@ -1,20 +1,20 @@
 package com.weareadaptive.auctionhouse.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
 
 public class Auction implements Model {
-    private final List<Bid> bids;
+    private final Map<String, Bid> bids;
     private final int id;
     private final String symbol;
     private final double price;
     private final int quantity;
     private final String seller;
     private AuctionStatus auctionStatus;
+
+    private Bid winningBid;
 
     public Auction(final int id, final String seller, final String symbol, final double price, final int quantity) {
         if (isNullOrEmpty(symbol)) {
@@ -32,7 +32,7 @@ public class Auction implements Model {
         this.symbol = symbol;
         this.price = price;
         this.quantity = quantity;
-        bids = new ArrayList<Bid>();
+        bids = new HashMap<>();
         this.auctionStatus = AuctionStatus.OPEN;
     }
 
@@ -62,7 +62,7 @@ public class Auction implements Model {
     }
 
     public Stream<Bid> getBids() {
-        return bids.stream();
+        return bids.values().stream();
     }
 
     public void makeBid(final String username, final double offer, final int quantity) {
@@ -73,6 +73,21 @@ public class Auction implements Model {
             throw new BusinessException("Username cannot be empty or null.");
         }
 
-        bids.add(new Bid(offer, quantity, new Date(), username));
+        bids.put(username, new Bid(offer, quantity, new Date(), username));
+    }
+
+    public void close() {
+        winningBid = bids.values().stream().reduce((acc, b) -> {
+            final var totalValue = b.offer() * b.quantity();
+            final var prevValue = acc.offer() * acc.quantity();
+            // order bids by price offer descending
+            // fill by highest price first and whatever quantity is left is filled for next highest
+            if (totalValue >= prevValue && b.timestamp().before(acc.timestamp())) {
+               return b;
+            }
+            return acc;
+        }).orElse(null);
+
+        this.auctionStatus = AuctionStatus.CLOSED;
     }
 }

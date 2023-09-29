@@ -4,6 +4,7 @@ import com.weareadaptive.auctionhouse.console.ConsoleMenu;
 import com.weareadaptive.auctionhouse.console.MenuContext;
 import com.weareadaptive.auctionhouse.model.AccessStatus;
 import com.weareadaptive.auctionhouse.model.User;
+import com.weareadaptive.auctionhouse.utils.StringUtil;
 
 import java.util.Optional;
 
@@ -222,16 +223,6 @@ public class UserManagementMenu extends ConsoleMenu {
 
     private void printAllUsers(MenuContext context) {
         final var userState = context.getState().userState();
-        userState.stream().forEach(u -> printUser(context, u));
-    }
-
-    private void printUser(final MenuContext context, final User user) {
-        context.getOut().printf(
-                "Username: %s, First name: %s, Last name: %s, Organisation: %s, Has access: %s%n",
-                user.getUsername(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getOrganisation(),
-                user.getAccessStatus() == AccessStatus.ALLOWED ? "Yes" : "No");
+        userState.stream().forEach(u -> context.getOut().println(StringUtil.userToString(u)));
     }
 }
