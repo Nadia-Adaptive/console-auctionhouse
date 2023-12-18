@@ -8,9 +8,9 @@ import static com.weareadaptive.auctionhouse.TestData.USER1;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AuctionStateTest {
-    private AuctionState state;
+    private static AuctionState state;
     @BeforeAll
-    public void beforeAll(){
+    public static void beforeAll(){
         state = new AuctionState();
         state.add(new Auction(0, USER1.getUsername(), "JPYUSD", 1.00, 10));
     }

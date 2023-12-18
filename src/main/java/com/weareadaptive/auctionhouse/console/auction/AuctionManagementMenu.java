@@ -7,7 +7,6 @@ import com.weareadaptive.auctionhouse.model.AuctionStatus;
 import com.weareadaptive.auctionhouse.model.Bid;
 
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import static com.weareadaptive.auctionhouse.utils.PromptUtil.*;
 
@@ -83,7 +82,9 @@ public class AuctionManagementMenu extends ConsoleMenu {
 
         out.println("=====> Close an Auction");
         out.println("Here are all your open auctions");
-        printAllAuctions(context, a -> a.getStatus() != AuctionStatus.CLOSED);
+        context.getState().auctionState().stream()
+                .filter(a -> a.getSeller() == context.getCurrentUser().getUsername() && a.getStatus() != AuctionStatus.CLOSED)
+                .forEach(a -> formatAuctionEntry(a));
 
         final var auction = getAuction(context);
 
@@ -112,14 +113,18 @@ public class AuctionManagementMenu extends ConsoleMenu {
     private void placeABid(MenuContext context) {
         final var out = context.getOut();
         final var auctionState = context.getState().auctionState();
+        final var auctions = auctionState.stream();
+        final var user = context.getCurrentUser().getUsername();
 
-        if (auctionState.stream().count() == 0) {
+        if (auctions.count() == 0) {
             out.println("There are no open auctions right now. Please try again later.");
             return;
         }
 
         out.println("Here's the list of available auctions.");
-        printAllAuctions(context, (a) -> true); // TODO: Should be able to leave predicate out
+       auctions.filter(a -> a.getSeller() != user)
+                .forEach(a -> out.println(formatAuctionEntry(a)));
+
         out.println(cancelOperationText);
 
         final var auction = getAuction(context);
@@ -142,7 +147,7 @@ public class AuctionManagementMenu extends ConsoleMenu {
             return;
         }
 
-        final var bid = new Bid(context.getCurrentUser().getUsername(), price, quantity);
+        final var bid = new Bid(user, price, quantity);
         auction.get().makeBid(bid);
         out.println("Bid created");
         pressEnter(context);
@@ -166,11 +171,8 @@ public class AuctionManagementMenu extends ConsoleMenu {
         } while (true);
     }
 
-    private void printAllAuctions(final MenuContext context, final Predicate<Auction> predicate) {
-        context.getState().auctionState().stream()
-                .filter(auction -> auction.getSeller() != context.getCurrentUser().getUsername() && predicate.test(auction))
-                .forEach(a -> context.getOut().println("Auction Id: %d | Title: %s".formatted(a.getId(), a.getSymbol()))
-                );
+    private String formatAuctionEntry(final Auction a) {
+        return "Auction Id: %d | Title: %s".formatted(a.getId(), a.getSymbol());
     }
 
     private Optional<Auction> getAuction(final MenuContext context) {

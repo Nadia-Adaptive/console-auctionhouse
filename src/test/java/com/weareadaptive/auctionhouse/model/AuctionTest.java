@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.weareadaptive.auctionhouse.TestData.USER1;
 import static com.weareadaptive.auctionhouse.TestData.USER2;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AuctionTest {
     private static Auction auction;
@@ -35,6 +34,21 @@ public class AuctionTest {
 
         auction.close();
         assertEquals(auction.getStatus(), AuctionStatus.CLOSED);
+        assertEquals(auction.getWinningBid(), winningBid);
+    }
+
+    @Test
+    @DisplayName("when two bids have the same value, closeAuction closes the auction with the earliest offer")
+    public void auctionClosesWithEarliestBid() {
+        final var winningBid = new Bid(USER1.getUsername(),1.2d, 5);
+        final var losingBid = new Bid(USER2.getUsername(),1.2d, 5);
+        auction.makeBid(losingBid);
+        auction.makeBid(winningBid);
+        assertTrue(auction.getStatus() == AuctionStatus.OPEN);
+
+        auction.close();
+        assertEquals(auction.getStatus(), AuctionStatus.CLOSED);
+        assertNotEquals(auction.getWinningBid(), losingBid);
         assertEquals(auction.getWinningBid(), winningBid);
     }
 }
