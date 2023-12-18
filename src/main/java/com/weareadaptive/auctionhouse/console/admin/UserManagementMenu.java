@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import static com.weareadaptive.auctionhouse.utils.PromptUtil.*;
 import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
+import static com.weareadaptive.auctionhouse.utils.StringUtil.organisationToString;
 
 public class UserManagementMenu extends ConsoleMenu {
     @Override
@@ -189,13 +190,8 @@ public class UserManagementMenu extends ConsoleMenu {
 
         out.println("== Organisation details");
         orgState.getAllDetails()
-                .map((o) ->
-                        o.users().stream()
-                                .map(u -> "Username: %s".formatted(u.getUsername()).indent(2))
-                                .reduce("Organisation %s".formatted(o.organisationName()),
-                                        (String acc, String val) -> String.join("\n", acc, val)
-                                )
-                ).sorted()
+                .map((o) -> organisationToString(o))
+                .sorted()
                 .forEach(out::println);
 
         pressEnter(context);

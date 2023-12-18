@@ -1,6 +1,9 @@
 package com.weareadaptive.auctionhouse;
 
+import com.weareadaptive.auctionhouse.model.OrganisationDetails;
 import com.weareadaptive.auctionhouse.model.User;
+
+import java.util.Arrays;
 
 public class TestData {
   public static final String ORG_1 = "Org 1";
@@ -15,6 +18,7 @@ public class TestData {
   public static final User USER3 = new User(3, "testuser3", "password", "jane", "doe", ORG_2);
   public static final User USER4 = new User(4, "testuser4", "password", "naomie", "legault", ORG_2);
 
+  public static final OrganisationDetails ORGANISATION1 = new OrganisationDetails(ORG_1, Arrays.asList(USER1));
 
   private TestData() {
   }

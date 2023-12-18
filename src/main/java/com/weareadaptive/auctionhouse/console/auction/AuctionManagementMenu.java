@@ -4,6 +4,7 @@ import com.weareadaptive.auctionhouse.console.ConsoleMenu;
 import com.weareadaptive.auctionhouse.console.MenuContext;
 import com.weareadaptive.auctionhouse.model.Auction;
 import com.weareadaptive.auctionhouse.model.AuctionStatus;
+import com.weareadaptive.auctionhouse.model.Bid;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -68,7 +69,9 @@ public class AuctionManagementMenu extends ConsoleMenu {
                 a.getSymbol(),
                 a.getStatus().toString(),
                 a.getBids()
-                        .map(b -> "Bid{User: %s, Offer: %.2f, Quantity: %d}".formatted(b.buyer(), b.offer(), b.quantity()))
+                        .map(b -> "Bid{User: %s, Offer: %.2f, Quantity: %d}".formatted(
+                                b.getBuyer(), b.getPrice(),
+                                b.getQuantity()))
                         .reduce((String acc, String val) -> String.join("%n", acc, val)
                         ).orElse(""))));
 
@@ -91,16 +94,17 @@ public class AuctionManagementMenu extends ConsoleMenu {
         do {
             final var isClosed = getStringInput(context, "Enter yes to close the auction or no to cancel the operation.");
 
-            switch (isClosed.toLowerCase()){
-            case "yes": {
-                auction.get().close();
-                out.println("Closed the auction.");
-            }
-            case "no": {
-                out.println(cancelOperationText);
-                return;
-            }
-            default: out.println(invalidInputMessage);
+            switch (isClosed.toLowerCase()) {
+                case "yes": {
+                    auction.get().close();
+                    out.println("Closed the auction.");
+                }
+                case "no": {
+                    out.println(cancelOperationText);
+                    return;
+                }
+                default:
+                    out.println(invalidInputMessage);
             }
         } while (true);
     }
@@ -131,14 +135,15 @@ public class AuctionManagementMenu extends ConsoleMenu {
             return;
         }
 
-        final var offer = getOfferPrice(context, auction.get());
+        final var price = getOfferPrice(context, auction.get());
 
-        if (hasUserTerminatedOperation(offer)) {
+        if (hasUserTerminatedOperation(price)) {
             out.println(terminatedOperationText);
             return;
         }
 
-        auction.get().makeBid(context.getCurrentUser().getUsername(), offer, quantity);
+        final var bid = new Bid(context.getCurrentUser().getUsername(), price, quantity);
+        auction.get().makeBid(bid);
         out.println("Bid created");
         pressEnter(context);
     }

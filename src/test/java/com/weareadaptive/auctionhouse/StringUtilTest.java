@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import static com.weareadaptive.auctionhouse.TestData.ORGANISATION1;
 import static com.weareadaptive.auctionhouse.TestData.USER1;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,4 +36,11 @@ public class StringUtilTest {
         assertEquals("Username: testuser1, First name: john, Last name: doe, Organisation: Org 1, Has access: Yes\n",
                 StringUtil.userToString(USER1));
     }
+
+  @Test
+  @DisplayName("should display organisation info in a particular format")
+  public void shouldDisplayOrganisationInfoInAParticularFormat() {
+    assertEquals("Organisation: Org 1\n"+"Username: testuser1".indent(2),
+            StringUtil.organisationToString(ORGANISATION1));
+  }
 }

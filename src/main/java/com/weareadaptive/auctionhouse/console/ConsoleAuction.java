@@ -28,7 +28,7 @@ public class ConsoleAuction {
                     state.organisationState().addUserToOrg(u);
                 });
         state.auctionState().add(new Auction(state.auctionState().nextId(), "admin", "jypUSD", 0.1, 10));
-        state.auctionState().get(0).makeBid("jf", 0.4, 5);
+        state.auctionState().get(0).makeBid(new Bid("jf", 0.4, 5));
     }
 
     public void start() {

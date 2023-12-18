@@ -1,6 +1,7 @@
 package com.weareadaptive.auctionhouse.model;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
@@ -65,24 +66,24 @@ public class Auction implements Model {
         return bids.values().stream();
     }
 
-    public void makeBid(final String username, final double offer, final int quantity) {
-        if (offer <= 0) {
-            throw new BusinessException("Offer must be greater than zero.");
+    public Bid getWinningBid(){
+        if(auctionStatus==AuctionStatus.OPEN){
+            throw new BusinessException("Auction is still open."); // TODO: Write better error message
         }
-        if (isNullOrEmpty(username)) {
-            throw new BusinessException("Username cannot be empty or null.");
-        }
+        return winningBid;
+    }
 
-        bids.put(username, new Bid(offer, quantity, new Date(), username));
+    public void makeBid(final Bid bid) {
+        bids.put(bid.getBuyer(), bid);
     }
 
     public void close() {
         winningBid = bids.values().stream().reduce((acc, b) -> {
-            final var totalValue = b.offer() * b.quantity();
-            final var prevValue = acc.offer() * acc.quantity();
+            final var totalValue = b.getPrice() * b.getQuantity();
+            final var prevValue = acc.getPrice() * acc.getQuantity();
             // order bids by price offer descending
             // fill by highest price first and whatever quantity is left is filled for next highest
-            if (totalValue >= prevValue && b.timestamp().before(acc.timestamp())) {
+            if (totalValue >= prevValue && b.getTimestamp().isBefore(acc.getTimestamp())) {
                return b;
             }
             return acc;

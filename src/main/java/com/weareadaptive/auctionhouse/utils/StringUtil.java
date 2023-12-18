@@ -1,6 +1,7 @@
 package com.weareadaptive.auctionhouse.utils;
 
 import com.weareadaptive.auctionhouse.model.AccessStatus;
+import com.weareadaptive.auctionhouse.model.OrganisationDetails;
 import com.weareadaptive.auctionhouse.model.User;
 
 public class StringUtil {
@@ -18,5 +19,15 @@ public class StringUtil {
                 user.getLastName(),
                 user.getOrganisation(),
                 user.getAccessStatus() == AccessStatus.ALLOWED ? "Yes" : "No");
+    }
+
+    public static String organisationToString(OrganisationDetails organisation) {
+        return "Organisation: %s%n%s".formatted(
+                organisation.organisationName(),
+                organisation.users().stream()
+                        .map(u -> "Username: %s".formatted(u.getUsername()).indent(2))
+                        .sorted()
+                        .reduce((String acc, String val) -> String.join("\n", acc, val)).orElse("")
+        );
     }
 }
