@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import static com.weareadaptive.auctionhouse.TestData.USER1;
 import static com.weareadaptive.auctionhouse.TestData.USER2;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AuctionTest {
     private static Auction auction;
@@ -14,7 +15,6 @@ public class AuctionTest {
     @BeforeAll
     public static void beforeAll() {
         auction = new Auction(0, USER1.getUsername(), "JPYUSD", 1.00, 10);
-
     }
 
     @Test

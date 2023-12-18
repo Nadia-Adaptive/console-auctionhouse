@@ -79,11 +79,11 @@ public class Auction implements Model {
 
     public void close() {
         winningBid = bids.values().stream().reduce((acc, b) -> {
-            final var totalValue = b.getPrice() * b.getQuantity();
-            final var prevValue = acc.getPrice() * acc.getQuantity();
+            final var currentOffer = b.getPrice() * b.getQuantity();
+            final var prevOffer = acc.getPrice() * acc.getQuantity();
             // order bids by price offer descending
             // fill by highest price first and whatever quantity is left is filled for next highest
-            if (totalValue >= prevValue && b.getTimestamp().isBefore(acc.getTimestamp())) {
+            if (currentOffer > prevOffer || b.getTimestamp().isBefore(acc.getTimestamp())) {
                return b;
             }
             return acc;
