@@ -63,8 +63,8 @@ public class AuctionManagementMenu extends ConsoleMenu {
         out.println("=====> Your Auctions");
         out.println("===================================");
 
-        allAuctions.forEach(a -> out.println("Id: %d%nSymbol: %s%nStatus: %s%nAll Bids: %s%n".formatted(
-                a.getId(),
+        allAuctions.forEach(a -> out.printf(
+                "Id: %d%nSymbol: %s%nStatus: %s%nAll Bids: %s%n%n", a.getId(),
                 a.getSymbol(),
                 a.getStatus().toString(),
                 a.getBids()
@@ -72,7 +72,7 @@ public class AuctionManagementMenu extends ConsoleMenu {
                                 b.getBuyer(), b.getPrice(),
                                 b.getQuantity()))
                         .reduce((String acc, String val) -> String.join("%n", acc, val)
-                        ).orElse(""))));
+                        ).orElse("")));
 
         pressEnter(context);
     }
@@ -83,8 +83,8 @@ public class AuctionManagementMenu extends ConsoleMenu {
         out.println("=====> Close an Auction");
         out.println("Here are all your open auctions");
         context.getState().auctionState().stream()
-                .filter(a -> a.getSeller() == context.getCurrentUser().getUsername() && a.getStatus() != AuctionStatus.CLOSED)
-                .forEach(a -> formatAuctionEntry(a));
+                .filter(a -> a.getSeller().equals(context.getCurrentUser().getUsername()) && a.getStatus() != AuctionStatus.CLOSED)
+                .forEach(this::formatAuctionEntry);
 
         final var auction = getAuction(context);
 
@@ -113,16 +113,15 @@ public class AuctionManagementMenu extends ConsoleMenu {
     private void placeABid(MenuContext context) {
         final var out = context.getOut();
         final var auctionState = context.getState().auctionState();
-        final var auctions = auctionState.stream();
         final var user = context.getCurrentUser().getUsername();
 
-        if (auctions.count() == 0) {
+        if (auctionState.stream().findAny().isEmpty()) {
             out.println("There are no open auctions right now. Please try again later.");
             return;
         }
 
         out.println("Here's the list of available auctions.");
-       auctions.filter(a -> a.getSeller() != user)
+        auctionState.stream().filter(a -> !a.getSeller().equals(user))
                 .forEach(a -> out.println(formatAuctionEntry(a)));
 
         out.println(cancelOperationText);
@@ -163,9 +162,9 @@ public class AuctionManagementMenu extends ConsoleMenu {
 
     private double getOfferPrice(final MenuContext context, final Auction auction) {
         do {
-            double offer = getDoubleInput(context, "Enter your offer (min amount is %.2f):".formatted(auction.getPrice()));
+            double offer = getDoubleInput(context, "Enter your offer (min amount is %.2f):".formatted(auction.getMinPrice()));
 
-            if (offer > auction.getPrice()) {
+            if (offer > auction.getMinPrice()) {
                 return offer;
             }
         } while (true);

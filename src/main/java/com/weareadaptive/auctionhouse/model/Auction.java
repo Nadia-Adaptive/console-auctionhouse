@@ -1,7 +1,7 @@
 package com.weareadaptive.auctionhouse.model;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
@@ -10,18 +10,23 @@ public class Auction implements Model {
     private final Map<String, Bid> bids;
     private final int id;
     private final String symbol;
-    private final double price;
+    private final double minPrice;
     private final int quantity;
     private final String seller;
     private AuctionStatus auctionStatus;
+    private Instant closingTime;
+    private double totalRevenue;
+    private double totalQuantitySold;
+    private List<Bid> winningBids;
 
-    private Bid winningBid;
-
-    public Auction(final int id, final String seller, final String symbol, final double price, final int quantity) {
+    public Auction(final int id, final String seller, final String symbol, final double minPrice, final int quantity) {
         if (isNullOrEmpty(symbol)) {
             throw new BusinessException("Symbol cannot be empty!");
         }
-        if (price <= 0d) {
+        if (isNullOrEmpty(seller)) {
+            throw new BusinessException("Seller cannot be empty!");
+        }
+        if (minPrice <= 0d) {
             throw new BusinessException("Price cannot be less than or equal to zero.");
         }
         if (quantity <= 0) {
@@ -31,9 +36,10 @@ public class Auction implements Model {
         this.id = id;
         this.seller = seller;
         this.symbol = symbol;
-        this.price = price;
+        this.minPrice = minPrice;
         this.quantity = quantity;
         bids = new HashMap<>();
+        winningBids = new ArrayList<>();
         this.auctionStatus = AuctionStatus.OPEN;
     }
 
@@ -46,8 +52,8 @@ public class Auction implements Model {
         return quantity;
     }
 
-    public double getPrice() {
-        return price;
+    public double getMinPrice() {
+        return minPrice;
     }
 
     public String getSymbol() {
@@ -66,11 +72,11 @@ public class Auction implements Model {
         return bids.values().stream();
     }
 
-    public Bid getWinningBid(){
-        if(auctionStatus==AuctionStatus.OPEN){
-            throw new BusinessException("Auction is still open."); // TODO: Write better error message
+    public List<Bid> getWinningBids() {
+        if (auctionStatus == AuctionStatus.OPEN) {
+            throw new BusinessException("Cannot get winning bids while auction is still open."); // TODO: Write better error message
         }
-        return winningBid;
+        return winningBids;
     }
 
     public void makeBid(final Bid bid) {
@@ -78,16 +84,15 @@ public class Auction implements Model {
     }
 
     public void close() {
-        winningBid = bids.values().stream().reduce((acc, b) -> {
-            final var currentOffer = b.getPrice() * b.getQuantity();
-            final var prevOffer = acc.getPrice() * acc.getQuantity();
-            // order bids by price offer descending
-            // fill by highest price first and whatever quantity is left is filled for next highest
-            if (currentOffer > prevOffer || b.getTimestamp().isBefore(acc.getTimestamp())) {
-               return b;
+        int quantityLeft = this.quantity;
+        final var sortedBids = bids.values().stream().sorted(Comparator.reverseOrder()).toList();
+
+        for (Bid bid : sortedBids) {
+            if (quantityLeft > 0) {
+                quantityLeft -= bid.getQuantity();
+                winningBids.add(bid);
             }
-            return acc;
-        }).orElse(null);
+        }
 
         this.auctionStatus = AuctionStatus.CLOSED;
     }

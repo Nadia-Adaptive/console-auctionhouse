@@ -4,13 +4,13 @@ import java.time.Instant;
 
 import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
 
-public class Bid {
+public class Bid implements Comparable<Bid> {
     private final Instant timestamp = Instant.now();
     private final double price;
     private final int quantity;
     private final String buyer;
 
-    public Bid(String buyer, double price, int quantity) {
+    public Bid(String buyer, double price, int quantity)  {
         if (isNullOrEmpty(buyer)) {
             throw new BusinessException("Buyer cannot be empty or null.");
         }
@@ -40,5 +40,21 @@ public class Bid {
 
     public String getBuyer() {
         return buyer;
+    }
+
+    @Override
+    public int compareTo(Bid o) {
+        if(price == o.price && timestamp.equals(o.timestamp)){
+            return 0;
+        }
+
+        if(this.price > o.price){
+            return 1;
+        }
+
+        if (this.price == o.price && o.timestamp.isAfter(this.timestamp)){
+            return 1;
+        }
+        return -1;
     }
 }
