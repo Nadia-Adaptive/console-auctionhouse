@@ -80,18 +80,34 @@ public class Auction implements Model {
     }
 
     public void makeBid(final Bid bid) {
+        if(auctionStatus == AuctionStatus.CLOSED){
+            throw new BusinessException("Can't bid on closed auction.");
+        }
         bids.put(bid.getBuyer(), bid);
     }
 
     public void close() {
+
+
+
         int quantityLeft = this.quantity;
         final var sortedBids = bids.values().stream().sorted(Comparator.reverseOrder()).toList();
 
         for (Bid bid : sortedBids) {
             if (quantityLeft > 0) {
                 quantityLeft -= bid.getQuantity();
+
+                if (quantityLeft < 0) {
+                    bid.updateStatus(BidFillStatus.PARTIALFILL);
+                } else {
+                    bid.updateStatus(BidFillStatus.FILLED);
+                }
+
                 winningBids.add(bid);
+            } else {
+                bid.updateStatus(BidFillStatus.UNFILLED);
             }
+
         }
 
         this.auctionStatus = AuctionStatus.CLOSED;

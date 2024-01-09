@@ -84,7 +84,7 @@ public class AuctionTest {
         assertTrue(auction.getStatus() == AuctionStatus.OPEN);
 
         auction.close();
-        assertEquals( AuctionStatus.CLOSED, auction.getStatus());
+        assertEquals(AuctionStatus.CLOSED, auction.getStatus());
         assertEquals(3, auction.getWinningBids().size());
     }
 
@@ -99,13 +99,38 @@ public class AuctionTest {
         auction.makeBid(bid02);
         auction.makeBid(bid03);
 
-        assertTrue(auction.getStatus() == AuctionStatus.OPEN);
-
         auction.close();
 
         assertEquals(AuctionStatus.CLOSED, auction.getStatus());
         assertEquals(bid03, auction.getWinningBids().get(0));
         assertEquals(bid02, auction.getWinningBids().get(1));
         assertEquals(bid01, auction.getWinningBids().get(2));
+    }
+
+    @Test
+    @DisplayName("closeAuction updates the bid status")
+    public void auctionClosesBidsAndUpdatesTheirStatus() {
+        final var bid01 = new Bid(USER1.getUsername(), 1.2d, 5);
+        final var bid02 = new Bid(USER2.getUsername(), 1.24d, 7);
+
+        auction.makeBid(bid01);
+        auction.makeBid(bid02);
+
+        auction.close();
+
+        assertEquals(AuctionStatus.CLOSED, auction.getStatus());
+
+        assertEquals(bid02.getStatus(), BidFillStatus.FILLED);
+        assertEquals(bid01.getStatus(), BidFillStatus.PARTIALFILL);
+    }
+
+    @Test
+    @DisplayName("makeBid throws an exception when the auction is closed")
+    public void biddingOnClosedAuctionThrowsException() {
+        final var bid01 = new Bid(USER1.getUsername(), 1.2d, 6);
+
+        auction.close();
+
+        assertThrows(BusinessException.class, () -> auction.makeBid(bid01));
     }
 }

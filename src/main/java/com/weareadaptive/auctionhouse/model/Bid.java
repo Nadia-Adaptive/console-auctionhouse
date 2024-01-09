@@ -9,8 +9,9 @@ public class Bid implements Comparable<Bid> {
     private final double price;
     private final int quantity;
     private final String buyer;
+    private BidFillStatus status;
 
-    public Bid(String buyer, double price, int quantity)  {
+    public Bid(String buyer, double price, int quantity) {
         if (isNullOrEmpty(buyer)) {
             throw new BusinessException("Buyer cannot be empty or null.");
         }
@@ -24,6 +25,7 @@ public class Bid implements Comparable<Bid> {
         this.price = price;
         this.quantity = quantity;
         this.buyer = buyer;
+        this.status = BidFillStatus.PENDING;
     }
 
     public Instant getTimestamp() {
@@ -44,17 +46,25 @@ public class Bid implements Comparable<Bid> {
 
     @Override
     public int compareTo(Bid o) {
-        if(price == o.price && timestamp.equals(o.timestamp)){
+        if (price == o.price && timestamp.equals(o.timestamp)) {
             return 0;
         }
 
-        if(this.price > o.price){
+        if (this.price > o.price) {
             return 1;
         }
 
-        if (this.price == o.price && o.timestamp.isAfter(this.timestamp)){
+        if (this.price == o.price && o.timestamp.isAfter(this.timestamp)) {
             return 1;
         }
         return -1;
+    }
+
+    public BidFillStatus getStatus() {
+        return status;
+    }
+
+    public void updateStatus(BidFillStatus fillStatus) {
+        this.status = fillStatus;
     }
 }
