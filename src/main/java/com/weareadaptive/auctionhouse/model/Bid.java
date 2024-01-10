@@ -2,18 +2,16 @@ package com.weareadaptive.auctionhouse.model;
 
 import java.time.Instant;
 
-import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
-
 public class Bid implements Comparable<Bid> {
-    private final Instant timestamp = Instant.now();
+    private final Instant timestamp = Instant.now(); // TODO: Consider moving initialisation to constructor
     private final double price;
     private final int quantity;
-    private final String buyer;
+    private final User buyer;
+    private double quantityFilled;
     private BidFillStatus status;
-
-    public Bid(String buyer, double price, int quantity) {
-        if (isNullOrEmpty(buyer)) {
-            throw new BusinessException("Buyer cannot be empty or null.");
+    public Bid(User buyer, double price, int quantity) {
+        if (buyer == null) {
+            throw new BusinessException("Buyer cannot be null.");
         }
         if (price <= 0) {
             throw new BusinessException("Price must be greater than zero.");
@@ -40,7 +38,7 @@ public class Bid implements Comparable<Bid> {
         return quantity;
     }
 
-    public String getBuyer() {
+    public User getBuyer() {
         return buyer;
     }
 
@@ -64,7 +62,35 @@ public class Bid implements Comparable<Bid> {
         return status;
     }
 
-    public void updateStatus(BidFillStatus fillStatus) {
-        this.status = fillStatus;
+    public double getQuantityFilled() {
+        return quantityFilled;
     }
+
+    public void fillBid(double quantityFilled) {
+        if (quantityFilled < 0) {
+            throw new BusinessException("Cannot fill a bid with a negative number");
+        }
+        if (quantityFilled > quantity) {
+            throw new BusinessException("Cannot fill a bid with a greater quantity than offered");
+        }
+        if (status != BidFillStatus.PENDING){
+            throw new BusinessException("Cannot fill a closed bid");
+        }
+
+        this.quantityFilled = quantityFilled;
+        if (quantityFilled == 0) {
+            this.status = BidFillStatus.UNFILLED;
+        }
+
+        else if (quantityFilled < quantity) {
+            this.status = BidFillStatus.PARTIALFILL;
+        }
+
+        else if (quantityFilled == quantity) {
+            this.status = BidFillStatus.FILLED;
+        }
+    }
+
+    // TODO: Add equals
+
 }

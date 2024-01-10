@@ -1,5 +1,6 @@
 package com.weareadaptive.auctionhouse.model;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
@@ -7,7 +8,7 @@ import java.util.stream.Stream;
 import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
 
 public class Auction implements Model {
-    private final Map<String, Bid> bids;
+    private final List<Bid> bids;
     private final int id;
     private final String symbol;
     private final double minPrice;
@@ -15,9 +16,10 @@ public class Auction implements Model {
     private final String seller;
     private AuctionStatus auctionStatus;
     private Instant closingTime;
-    private double totalRevenue;
-    private double totalQuantitySold;
-    private List<Bid> winningBids;
+    private BigDecimal totalRevenue;
+    private int totalQuantitySold;
+    final private List<Bid> winningBids;
+    final private List<Bid> losingBids;
 
     public Auction(final int id, final String seller, final String symbol, final double minPrice, final int quantity) {
         if (isNullOrEmpty(symbol)) {
@@ -38,8 +40,9 @@ public class Auction implements Model {
         this.symbol = symbol;
         this.minPrice = minPrice;
         this.quantity = quantity;
-        bids = new HashMap<>();
+        bids = new ArrayList<>();
         winningBids = new ArrayList<>();
+        losingBids = new ArrayList<>();
         this.auctionStatus = AuctionStatus.OPEN;
     }
 
@@ -69,47 +72,56 @@ public class Auction implements Model {
     }
 
     public Stream<Bid> getBids() {
-        return bids.values().stream();
+        return bids.stream();
     }
 
-    public List<Bid> getWinningBids() {
+    public Stream<Bid> getWinningBids() {
         if (auctionStatus == AuctionStatus.OPEN) {
-            throw new BusinessException("Cannot get winning bids while auction is still open."); // TODO: Write better error message
+            throw new BusinessException("Cannot get winning bids while auction is open.");
         }
-        return winningBids;
+        return winningBids.stream();
     }
 
     public void makeBid(final Bid bid) {
-        if(auctionStatus == AuctionStatus.CLOSED){
+        if (auctionStatus == AuctionStatus.CLOSED) {
             throw new BusinessException("Can't bid on closed auction.");
         }
-        bids.put(bid.getBuyer(), bid);
+        bids.add(bid);
     }
 
     public void close() {
+        bids.stream().sorted(Comparator.reverseOrder()).forEach(bid -> {
+            if (totalQuantitySold < quantity) {
+                double fillQuantity = bid.getQuantity();
+                totalQuantitySold += fillQuantity;
 
-
-
-        int quantityLeft = this.quantity;
-        final var sortedBids = bids.values().stream().sorted(Comparator.reverseOrder()).toList();
-
-        for (Bid bid : sortedBids) {
-            if (quantityLeft > 0) {
-                quantityLeft -= bid.getQuantity();
-
-                if (quantityLeft < 0) {
-                    bid.updateStatus(BidFillStatus.PARTIALFILL);
-                } else {
-                    bid.updateStatus(BidFillStatus.FILLED);
+                if (totalQuantitySold > quantity) {
+                    fillQuantity = bid.getQuantity() - (totalQuantitySold - quantity);
+                    totalQuantitySold = quantity;
                 }
+                bid.fillBid(fillQuantity);
 
+                totalRevenue=totalRevenue.add(BigDecimal.valueOf(bid.getPrice()).multiply(BigDecimal.valueOf(fillQuantity)));
                 winningBids.add(bid);
             } else {
-                bid.updateStatus(BidFillStatus.UNFILLED);
+                bid.fillBid(0);
+                losingBids.add(bid);
             }
-
-        }
-
+        });
+        // TODO: Search for, and possibly eliminate, any toList
         this.auctionStatus = AuctionStatus.CLOSED;
+    }
+
+    public Boolean hasUserBid(String username) {
+        return bids.stream().anyMatch(b -> b.getBuyer().equals(username));
+    }
+
+    @Override
+    public String toString() {
+        return "Auction{" +
+                "id=" + id +
+                ", symbol='" + symbol + '\'' +
+                ", seller='" + seller + '\'' +
+                '}';
     }
 }

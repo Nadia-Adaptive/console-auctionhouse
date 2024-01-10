@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PromptUtilTest {
-    // TODO: Refactor scanner + context creation into before each
     @Test
     @DisplayName("getIntegerInput should parse user data into int")
     public void shouldParseUserDataIntoInt() {

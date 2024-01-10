@@ -37,53 +37,23 @@ public class AuctionStateTest {
     }
 
     @Test
-    @DisplayName("getWinningBids returns all the user's winning bids across all auctions")
-    public void getWinningBidsByUser() {
-        final var bid01 = new Bid(USER1.getUsername(), 1.2, 10);
-        final var losingBid01 = new Bid(USER2.getUsername(), 1, 10);
-        final var bid02 = new Bid(USER1.getUsername(), 11, 11);
+    @DisplayName("getAuctionsUserBidOn returns all the auctions the user's bid on")
+    public void getAuctionsUserHasBidOn() {
+        final var bid01 = new Bid(USER1, 1.2, 10);
 
         state.add(AUCTION2);
 
         AUCTION1.makeBid(bid01);
-        AUCTION1.makeBid(losingBid01);
-
-        AUCTION2.makeBid(bid02);
+        AUCTION2.makeBid(bid01);
 
         AUCTION1.close();
         AUCTION2.close();
 
-        final var winningBids = state.getAllUserWinningBids(USER1.getUsername());
+        final var auctions = state.getAuctionsUserBidOn(USER1.getUsername()).toList();
 
-        assertEquals(2, winningBids.size());
+        assertEquals(2, auctions.size());
 
-        System.out.println(bid01.getStatus());
-
-        assertEquals(bid01, winningBids.get(0));
-        assertEquals(bid02, winningBids.get(1));
-    }
-
-    @Test
-    @DisplayName("getLosingBids returns all the user's losing bids across all auctions")
-    public void getLosingBidsByUser() {
-        final var bid01 = new Bid(USER1.getUsername(), 1.2, 10);
-        final var losingBid01 = new Bid(USER2.getUsername(), 1, 10);
-        final var bid02 = new Bid(USER1.getUsername(), 11, 11);
-
-        state.add(AUCTION2);
-
-        AUCTION1.makeBid(bid01);
-        AUCTION1.makeBid(losingBid01);
-
-        AUCTION2.makeBid(bid02);
-
-        AUCTION1.close();
-        AUCTION2.close();
-
-        final var losingBids = state.getAllUserLosingBids(USER2.getUsername());
-
-        assertEquals(1, losingBids.size());
-
-        assertEquals(losingBid01, losingBids.get(0));
+        assertTrue(auctions.get(0).getBids().anyMatch(b -> b.equals(bid01)));
+        assertTrue(auctions.get(1).getBids().anyMatch(b -> b.equals(bid01)));
     }
 }
