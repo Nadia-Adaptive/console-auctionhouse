@@ -13,20 +13,22 @@ public class Auction implements Model {
     private final String symbol;
     private final double minPrice;
     private final int quantity;
-    private final String seller;
+    private final User seller;
     private AuctionStatus auctionStatus;
     private Instant closingTime;
     private BigDecimal totalRevenue;
+
+
     private int totalQuantitySold;
     final private List<Bid> winningBids;
     final private List<Bid> losingBids;
 
-    public Auction(final int id, final String seller, final String symbol, final double minPrice, final int quantity) {
+    public Auction(final int id, final User seller, final String symbol, final double minPrice, final int quantity) {
         if (isNullOrEmpty(symbol)) {
             throw new BusinessException("Symbol cannot be empty!");
         }
-        if (isNullOrEmpty(seller)) {
-            throw new BusinessException("Seller cannot be empty!");
+        if (seller == null) {
+            throw new BusinessException("Seller cannot be null!");
         }
         if (minPrice <= 0d) {
             throw new BusinessException("Price cannot be less than or equal to zero.");
@@ -44,6 +46,7 @@ public class Auction implements Model {
         winningBids = new ArrayList<>();
         losingBids = new ArrayList<>();
         this.auctionStatus = AuctionStatus.OPEN;
+        totalRevenue = new BigDecimal(0);
     }
 
     @Override
@@ -63,12 +66,20 @@ public class Auction implements Model {
         return symbol;
     }
 
-    public String getSeller() {
+    public User getSeller() {
         return seller;
     }
 
     public AuctionStatus getStatus() {
         return auctionStatus;
+    }
+
+    public double getTotalRevenue() {
+        return totalRevenue.doubleValue();
+    }
+
+    public int getTotalQuantitySold() {
+        return totalQuantitySold;
     }
 
     public Stream<Bid> getBids() {
@@ -82,9 +93,13 @@ public class Auction implements Model {
         return winningBids.stream();
     }
 
-    public void makeBid(final Bid bid) {
+    public void placeABid(final Bid bid) {
         if (auctionStatus == AuctionStatus.CLOSED) {
             throw new BusinessException("Can't bid on closed auction.");
+        }
+
+        if (bid.getPrice() < minPrice) {
+            throw new BusinessException("Bid doesn't meet minimum price.");
         }
         bids.add(bid);
     }
@@ -101,7 +116,7 @@ public class Auction implements Model {
                 }
                 bid.fillBid(fillQuantity);
 
-                totalRevenue=totalRevenue.add(BigDecimal.valueOf(bid.getPrice()).multiply(BigDecimal.valueOf(fillQuantity)));
+                totalRevenue = totalRevenue.add(BigDecimal.valueOf(bid.getPrice()).multiply(BigDecimal.valueOf(fillQuantity)));
                 winningBids.add(bid);
             } else {
                 bid.fillBid(0);
@@ -113,7 +128,7 @@ public class Auction implements Model {
     }
 
     public Boolean hasUserBid(String username) {
-        return bids.stream().anyMatch(b -> b.getBuyer().equals(username));
+        return bids.stream().anyMatch(b -> b.getBuyer().getUsername().equals(username));
     }
 
     @Override
@@ -123,5 +138,9 @@ public class Auction implements Model {
                 ", symbol='" + symbol + '\'' +
                 ", seller='" + seller + '\'' +
                 '}';
+    }
+
+    public Stream<Bid> getLosingBids() {
+        return losingBids.stream();
     }
 }

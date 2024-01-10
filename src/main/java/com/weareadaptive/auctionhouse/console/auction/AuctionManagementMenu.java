@@ -48,7 +48,7 @@ public class AuctionManagementMenu extends ConsoleMenu {
             return;
         }
 
-        final var newAuction = new Auction(auctionState.nextId(), user.getUsername(), symbol, price, quantity);
+        final var newAuction = new Auction(auctionState.nextId(), user, symbol, price, quantity);
 
         auctionState.add(newAuction);
         out.println("Created new auction.");
@@ -150,7 +150,7 @@ public class AuctionManagementMenu extends ConsoleMenu {
         }
 
         final var bid = new Bid(user, price, quantity);
-        auction.get().makeBid(bid);
+        auction.get().placeABid(bid);
         out.println("Bid created");
         pressEnter(context);
     }

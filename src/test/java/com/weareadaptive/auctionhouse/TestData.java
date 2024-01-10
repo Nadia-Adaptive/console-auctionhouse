@@ -20,8 +20,8 @@ public class TestData {
   public static final User USER4 = new User(4, "testuser4", "password", "naomie", "legault", ORG_2);
 
   public static final OrganisationDetails ORGANISATION1 = new OrganisationDetails(ORG_1, Arrays.asList(USER1));
-  public static final Auction AUCTION1 = new Auction(0, USER4.getUsername(), "TEST", 1.0, 10);
-  public static final Auction AUCTION2 = new Auction(1, USER3.getUsername(), "TEST2", 2.0, 11);
+  public static final Auction AUCTION1 = new Auction(0, USER4, "TEST", 1.0, 10);
+  public static final Auction AUCTION2 = new Auction(1, USER3, "TEST2", 2.0, 11);
 
 
   private TestData() {

@@ -7,7 +7,6 @@ import static com.weareadaptive.auctionhouse.TestData.USER1;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BidTest {
-
     @Test
     @DisplayName("Throws an exception when buyer is null")
     void throwExceptionBuyerIsNull() {
@@ -15,8 +14,8 @@ class BidTest {
     }
 
     @Test
-    @DisplayName("Throws an exception when minPrice is 0 or less")
-    void throwExceptionMinPriceIsZeroOrLess() {
+    @DisplayName("Throws an exception when offerPrice is 0 or less")
+    void throwExceptionOfferIsZeroOrLess() {
         assertThrows(BusinessException.class, () -> new Bid(USER1, 0, 10));
         assertThrows(BusinessException.class, () -> new Bid(USER1, -1, 10));
     }

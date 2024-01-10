@@ -18,7 +18,7 @@ public class AuctionStateTest {
 
     @Test
     @DisplayName("getUserAuctions returns a list of all a user's auctions")
-    public void returnAListOfAUsersAuctions() {
+    public void getUsersAuctions() {
         final var allAuctions = state.getUserAuctions(USER4.getUsername());
 
         assertEquals(1, allAuctions.count());
@@ -39,12 +39,13 @@ public class AuctionStateTest {
     @Test
     @DisplayName("getAuctionsUserBidOn returns all the auctions the user's bid on")
     public void getAuctionsUserHasBidOn() {
-        final var bid01 = new Bid(USER1, 1.2, 10);
+        final var bid01 = new Bid(USER1, 12, 10);
+        final var bid02 = new Bid(USER1, 12, 10);
 
         state.add(AUCTION2);
 
-        AUCTION1.makeBid(bid01);
-        AUCTION2.makeBid(bid01);
+        AUCTION1.placeABid(bid01);
+        AUCTION2.placeABid(bid02);
 
         AUCTION1.close();
         AUCTION2.close();
@@ -54,6 +55,6 @@ public class AuctionStateTest {
         assertEquals(2, auctions.size());
 
         assertTrue(auctions.get(0).getBids().anyMatch(b -> b.equals(bid01)));
-        assertTrue(auctions.get(1).getBids().anyMatch(b -> b.equals(bid01)));
+        assertTrue(auctions.get(1).getBids().anyMatch(b -> b.equals(bid02)));
     }
 }

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AuctionManagementMenuTest {
     public static MenuContext createAuctionContext(final String src) {
         final var auctionState = new AuctionState();
-        auctionState.add(new Auction(auctionState.nextId(), USER1.getUsername(), "TESLA", 1.02d, 100));
+        auctionState.add(new Auction(0, USER1, "TESLA", 1.02d, 100));
 
         final AuctionManagementMenu menu = new AuctionManagementMenu();
 
