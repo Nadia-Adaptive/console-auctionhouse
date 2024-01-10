@@ -57,8 +57,13 @@ class BidTest {
         bid03.fillBid(0);
 
         assertEquals(BidFillStatus.FILLED, bid01.getStatus());
+        assertEquals(10, bid01.getQuantityFilled());
+
         assertEquals(BidFillStatus.PARTIALFILL, bid02.getStatus());
+        assertEquals(5, bid02.getQuantityFilled());
+
         assertEquals(BidFillStatus.UNFILLED, bid03.getStatus());
+        assertEquals(0, bid03.getQuantityFilled());
     }
 
     @Test
