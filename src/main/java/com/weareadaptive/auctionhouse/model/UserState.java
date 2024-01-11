@@ -5,13 +5,11 @@ import java.util.Map;
 import java.util.Optional;
 
 public class UserState extends State<User> {
-
     private final Map<String, User> usernameIndex;
 
     public UserState() {
         usernameIndex = new HashMap<>();
     }
-
 
     public Optional<User> findUserByUsername(String username, String password) {
         return stream()

@@ -14,22 +14,22 @@ public class OrganisationStateTest {
     @BeforeEach
     public void initState() {
         state = new OrganisationState();
-        state.addUserToOrg(USER1);
+        state.addUserToOrganisation(USER1);
     }
 
     @Test
     @DisplayName("addUserToOrg should create an organisation details object if it didn't already exist")
     public void shouldCreateNewOrganisationDetailIfItDoesntExist() {
         final var initialOrganisationCount = state.getAllOrganisations().count();
-        state.addUserToOrg(USER3);
+        state.addUserToOrganisation(USER3);
         assertNotEquals(2, initialOrganisationCount);
     }
 
     @Test
-    @DisplayName("addUserToOrg should not create an organisation details object if it didn't already exist")
+    @DisplayName("addUserToOrg should not create an organisation details object if it already exists")
     public void shouldNotCreateNewOrganisationDetailIfItExists() {
         final var initialOrganisationCount = state.getAllOrganisations().count();
-        state.addUserToOrg(USER2);
+        state.addUserToOrganisation(USER2);
         assertEquals(1, initialOrganisationCount);
     }
 
@@ -37,7 +37,22 @@ public class OrganisationStateTest {
     @DisplayName("addUserToOrg should not create an organisation for admins")
     public void shouldNotCreateAdminOrganisation() {
         final var initialOrganisationCount = state.getAllOrganisations().count();
-        state.addUserToOrg(ADMIN);
+        state.addUserToOrganisation(ADMIN);
         assertEquals(1, initialOrganisationCount);
+    }
+
+    @Test
+    @DisplayName("removeUserFromOrganisation should remove existing user from specified organisation")
+    public void removeExistingUserFromOrganisation() {
+        final var organisation = state.getAllDetails().findFirst().get();
+        assertEquals(true, state.removeUserFromOrganisation(USER1, ORG_1));
+    }
+
+    @Test
+    @DisplayName("removeUserFromOrganisation should remove existing user from specified organisation")
+    public void doNothingIfUserDoesntExist() {
+        final var organisation = state.getAllDetails().findFirst().get();
+        assertEquals(false,  state.removeUserFromOrganisation(new User(15, "test", "password", "t", "t", "t")
+                , ORG_1));
     }
 }

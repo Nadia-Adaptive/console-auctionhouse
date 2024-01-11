@@ -20,7 +20,7 @@ public class OrganisationState {
         return detailsMap.keySet().stream();
     }
 
-    public void addUserToOrg(final User u) {
+    public void addUserToOrganisation(final User u) {
         if (u.isAdmin()) { // Assuming admins should not be added to an organisation
             return;
         }
@@ -35,11 +35,10 @@ public class OrganisationState {
             detailsMap.put(organisationName, new OrganisationDetails(organisationName, users));
         }
     }
-    public void updateOrganisation(final User u, final String oldOrganisation) {
+    public boolean removeUserFromOrganisation(final User u, final String oldOrganisation) {
         if (detailsMap.containsKey(oldOrganisation)) {
-            detailsMap.get(oldOrganisation).users().remove(u);
+            return detailsMap.get(oldOrganisation).users().remove(u);
         }
-
-        addUserToOrg(u);
+        return false;
     }
 }

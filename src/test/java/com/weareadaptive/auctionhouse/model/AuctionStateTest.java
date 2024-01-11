@@ -14,6 +14,7 @@ public class AuctionStateTest {
     public void beforeEach() {
         state = new AuctionState();
         state.add(AUCTION1);
+        state.add(AUCTION3);
     }
 
     @Test
@@ -22,6 +23,14 @@ public class AuctionStateTest {
         final var allAuctions = state.getUserAuctions(USER4.getUsername());
 
         assertEquals(1, allAuctions.count());
+    }
+
+    @Test
+    @DisplayName("getAvailableAuctions returns a list of all the auctions a user can bid on")
+    public void getAvailableAuctions() {
+        final var availableAuctions = state.getAvailableAuctions(USER4.getUsername());
+
+        assertEquals(1, availableAuctions.count());
     }
 
     @Test

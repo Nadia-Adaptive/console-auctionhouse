@@ -79,7 +79,7 @@ public class UserManagementMenu extends ConsoleMenu {
         user.get().update(hasUserTerminatedOperation(uName) ? "" : uName, password, fName, lName, organisation);
 
         if (!isNullOrEmpty(organisation) && user.get().getOrganisation() != oldOrganisation) {
-            context.getState().organisationState().updateOrganisation(user.get(), oldOrganisation);
+            context.getState().organisationState().removeUserFromOrganisation(user.get(), oldOrganisation);
         }
 
         out.println("User updated.");
@@ -144,7 +144,7 @@ public class UserManagementMenu extends ConsoleMenu {
         final var newUser = new User(userState.nextId(), uName, password, fName, lName, organisation);
 
         out.printf("Created new user %s%n", newUser.getUsername());
-        orgState.addUserToOrg(newUser);
+        orgState.addUserToOrganisation(newUser);
         userState.add(newUser);
 
         pressEnter(context);
@@ -212,7 +212,6 @@ public class UserManagementMenu extends ConsoleMenu {
 
         out.println("== All Users");
         printAllUsers(context);
-        out.println();
 
         pressEnter(context);
     }

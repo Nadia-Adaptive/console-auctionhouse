@@ -11,8 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
-import static com.weareadaptive.auctionhouse.TestData.USER1;
-import static com.weareadaptive.auctionhouse.TestData.USER2;
+import static com.weareadaptive.auctionhouse.TestData.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserManagementMenuTest {
@@ -48,6 +47,12 @@ public class UserManagementMenuTest {
         Scanner scanner = new Scanner(src);
         MenuContext context = new MenuContext(new ModelState(new UserState(), new OrganisationState(), new AuctionState()), scanner, System.out);
         context.getState().userState().add(USER2);
+        context.getState().userState().add(USER3);
+        context.getState().userState().add(USER4);
+
+        context.getState().organisationState().addUserToOrganisation(USER2);
+        context.getState().organisationState().addUserToOrganisation(USER3);
+        context.getState().organisationState().addUserToOrganisation(USER4);
 
         menu.display(context);
 
@@ -99,8 +104,25 @@ public class UserManagementMenuTest {
     @Test
     @DisplayName("admin can change users access status")
     public void adminCanChangeUserStatus() {
-        final MenuContext context = createUserContext("4\n%s\nblock\n7".formatted(USER2.getUsername()));
+        assertDoesNotThrow(()->createUserContext("4\n%s\nblock\n7".formatted(USER2.getUsername())));
 
         assertEquals(AccessStatus.BLOCKED, USER2.getAccessStatus());
+    }
+    @Test
+    @DisplayName("admin can view users information")
+    public void adminCanViewUserInformation() {
+        assertDoesNotThrow(()->createUserContext("2\n\r7"));
+    }
+
+    @Test
+    @DisplayName("admin can get view all organisations")
+    public void adminCanViewAllOrganisations() {
+        assertDoesNotThrow(()->createUserContext("5\n\r7"));
+    }
+
+    @Test
+    @DisplayName("admin can get view all organisations details")
+    public void adminCanViewOrganisationDetails() {
+        assertDoesNotThrow(()->createUserContext("6\n\r7"));
     }
 }
