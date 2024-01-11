@@ -24,7 +24,7 @@ public class AuctionTest {
 
     @BeforeEach
     public void beforeEach() {
-        auction = new Auction(0, USER1, "JPYUSD", 1.00, 10);
+        auction = new Auction(0, USER4, "JPYUSD", 1.00, 10);
     }
 
     @Test
@@ -67,6 +67,14 @@ public class AuctionTest {
     @DisplayName("placeABid throws an exception when the bid doesn't meet the auction's minimum price")
     public void placeABidThrowsExceptionWhenBidDoesntMeetMinPrice() {
         final var bid01 = new Bid(USER1, 0.2d, 6);
+
+        assertThrows(BusinessException.class, () -> auction.placeABid(bid01));
+    }
+
+    @Test
+    @DisplayName("placeABid throws an exception when the seller tries to bid on their own auction")
+    public void placeABidThrowsExceptionWhenSellerTriesToBid() {
+        final var bid01 = new Bid(USER4, 0.2d, 6);
 
         assertThrows(BusinessException.class, () -> auction.placeABid(bid01));
     }
@@ -183,5 +191,4 @@ public class AuctionTest {
         assertTrue(auction.hasUserBid(USER1.getUsername()));
         assertFalse(auction.hasUserBid(USER4.getUsername()));
     }
-
 }

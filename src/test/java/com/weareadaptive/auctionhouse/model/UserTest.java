@@ -71,10 +71,8 @@ public class UserTest {
         final var user = new User(1, "test", "thepassword", "Jonh", "Doe", "Adaptive");
         final var testName = "Test user01";
 
-        //Act
         user.update(testName, "", "", "", "");
 
-        //Assert
         assertTrue(user.getUsername().equals(testName));
     }
 
@@ -83,10 +81,16 @@ public class UserTest {
     public void shouldNotModifyUserWithNewFieldsIfTheFieldsAreEmpty() {
         final var user = new User(1, "test", "thepassword", "Jonh", "Doe", "Adaptive");
 
-        //Act
         user.update("", "", "", "", "");
 
-        //Assert
         assertTrue(user.getUsername().equals("test"));
+    }
+
+    @Test
+    @DisplayName("a new user's default access status should be allowed")
+    public void userDefaultStatusIsAllowed() {
+        final var user = new User(1, "test", "thepassword", "Jonh", "Doe", "Adaptive");
+
+        assertEquals(AccessStatus.ALLOWED,  user.getAccessStatus());
     }
 }

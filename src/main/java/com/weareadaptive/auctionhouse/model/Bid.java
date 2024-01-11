@@ -7,7 +7,7 @@ public class Bid implements Comparable<Bid> {
     private final double price;
     private final int quantity;
     private final User buyer;
-    private double quantityFilled;
+    private int quantityFilled;
     private BidFillStatus status;
     public Bid(User buyer, double price, int quantity) {
         if (buyer == null) {
@@ -62,11 +62,11 @@ public class Bid implements Comparable<Bid> {
         return status;
     }
 
-    public double getQuantityFilled() {
+    public int getQuantityFilled() {
         return quantityFilled;
     }
 
-    public void fillBid(double quantityFilled) {
+    public void fillBid(int quantityFilled) {
         if (quantityFilled < 0) {
             throw new BusinessException("Cannot fill a bid with a negative number");
         }

@@ -8,6 +8,7 @@ import com.weareadaptive.auctionhouse.model.Bid;
 
 import java.util.Optional;
 
+import static com.weareadaptive.auctionhouse.utils.AuctionManagementMenuFormatters.*;
 import static com.weareadaptive.auctionhouse.utils.PromptUtil.*;
 
 public class AuctionManagementMenu extends ConsoleMenu {
@@ -23,7 +24,7 @@ public class AuctionManagementMenu extends ConsoleMenu {
                 leave("Go back"));
     }
 
-    private void createAuction(MenuContext context) {
+    private void createAuction(final MenuContext context) {
         final var user = context.getCurrentUser();
         final var auctionState = context.getState().auctionState();
         final var out = context.getOut();
@@ -56,42 +57,43 @@ public class AuctionManagementMenu extends ConsoleMenu {
         pressEnter(context);
     }
 
-    private void listUserAuctions(MenuContext context) {
+    private void listUserAuctions(final MenuContext context) {
         final var out = context.getOut();
         final var allAuctions = context.getState().auctionState().getUserAuctions(context.getCurrentUser().getUsername());
 
         out.println("=====> Your Auctions");
         out.println("===================================");
-
-        allAuctions.forEach(a -> out.printf(
-                "Id: %d%nSymbol: %s%nStatus: %s%nAll Bids: %s%n%n", a.getId(),
-                a.getSymbol(),
-                a.getStatus().toString(),
-                a.getBids()
-                        .map(b -> "Bid{User: %s, Offer: %.2f, Quantity: %d}".formatted(
-                                b.getBuyer(), b.getPrice(),
-                                b.getQuantity()))
-                        .reduce((String acc, String val) -> String.join("%n", acc, val)
-                        ).orElse("")));
-
+        allAuctions.forEach(a -> {
+            if (a.getStatus() == AuctionStatus.OPEN) {
+                out.printf(formatOpenAuctionSummary(a));
+            } else {
+                out.printf(formatClosedAuctionSummary(a));
+            }
+        });
+        out.println("\n===================================");
         pressEnter(context);
     }
 
     private void closeAuction(final MenuContext context) {
         final var out = context.getOut();
 
-        out.println("=====> Close an Auction");
+        out.println("\n=====> Close an Auction");
+        out.println(cancelOperationText);
         out.println("Here are all your open auctions");
 
-        out.println("===============================\n");
-        context.getState().auctionState().stream()
-                .filter(a -> a.getSeller().equals(context.getCurrentUser().getUsername()) && a.getStatus() != AuctionStatus.CLOSED)
+        out.println("==============================================");
+        context.getState().auctionState().getUserAuctions(context.getCurrentUser().getUsername())
                 .forEach(a -> out.println(formatAuctionEntry(a)));
-        out.println("===============================\n");
 
-        final var auction = getAuction(context);
+        final var auction = getOwnAuction(context);
+        if (auction.isEmpty()) {
+            return;
+        }
 
-        out.println("Here is a summary of the auction.");
+        out.println("Here is a summary of the auction.\n========");
+
+        out.println(formatAuctionEntry(auction.get()));
+        auction.get().getBids().forEach(b -> out.println(formatSellerBidEntry(b)));
 
         out.println("Do you wish to close it?");
 
@@ -99,21 +101,21 @@ public class AuctionManagementMenu extends ConsoleMenu {
             final var isClosed = getStringInput(context, "Enter yes to close the auction or no to cancel the operation.");
 
             switch (isClosed.toLowerCase()) {
-                case "yes": {
+                case "yes" -> {
                     auction.get().close();
                     out.println("Closed the auction.");
+                    return;
                 }
-                case "no": {
+                case "no" -> {
                     out.println(cancelOperationText);
                     return;
                 }
-                default:
-                    out.println(invalidInputMessage);
+                default -> out.println(invalidInputMessage);
             }
         } while (true);
     }
 
-    private void placeABid(MenuContext context) {
+    private void placeABid(final MenuContext context) {
         final var out = context.getOut();
         final var auctionState = context.getState().auctionState();
         final var user = context.getCurrentUser();
@@ -124,28 +126,27 @@ public class AuctionManagementMenu extends ConsoleMenu {
         }
 
         out.println("Here's the list of available auctions.");
+
+        out.println("================================");
         auctionState.getAvailableAuctions(user.getUsername())
                 .forEach(a -> out.println(formatAuctionEntry(a)));
 
         out.println(cancelOperationText);
 
-        final var auction = getAuction(context);
+        final var auction = getBiddableAuction(context);
 
         if (auction.isEmpty()) {
-            out.println(terminatedOperationText);
             return;
         }
 
         final var quantity = getIntegerInput(context, "Enter the quantity you're bidding for:");
         if (hasUserTerminatedOperation(quantity)) {
-            out.println(terminatedOperationText);
             return;
         }
 
         final var price = getOfferPrice(context, auction.get());
 
         if (hasUserTerminatedOperation(price)) {
-            out.println(terminatedOperationText);
             return;
         }
 
@@ -162,15 +163,25 @@ public class AuctionManagementMenu extends ConsoleMenu {
                 .getState().auctionState()
                 .getAuctionsUserBidOn(username);
 
-        out.println("Here are the auctions you have bid on.");
+        out.println("Here are your winning bids.\n=======");
 
         auctions.forEach(a ->
-                a.getWinningBids().forEach(b -> out.println(formatBidEntry(a, b))
+                a.getWinningBids().forEach(b -> out.println(formatBuyerBidEntry(a, b))
                 ));
     }
 
     private void listLostBids(final MenuContext context) {
+        final var out = context.getOut();
+        final var username = context.getCurrentUser().getUsername();
+        final var auctions = context
+                .getState().auctionState()
+                .getAuctionsUserBidOn(username);
 
+        out.println("Here are your losing bids.\n=======");
+
+        auctions.forEach(a ->
+                a.getLosingBids().forEach(b -> out.println("\t%s\n".formatted(formatBuyerBidEntry(a, b)))
+                ));
     }
 
     private double getOfferPrice(final MenuContext context, final Auction auction) {
@@ -183,34 +194,42 @@ public class AuctionManagementMenu extends ConsoleMenu {
         } while (true);
     }
 
-    private String formatAuctionEntry(final Auction a) {
-        return "Auction Id: %d | Title: %s".formatted(a.getId(), a.getSymbol());
-    }
-
-    private String formatBidEntry(final Auction a, final Bid b) {
-        return "Made on %s's %s | Offer price: %d | Quantity: %d | Status: %s%n".formatted(
-                a.getSeller(), a.getSymbol(),
-                b.getPrice(), b.getQuantity(),
-                b.getStatus().toString());
-    }
-
     private Optional<Auction> getAuction(final MenuContext context) {
         final var state = context.getState().auctionState();
         final var out = context.getOut();
         do {
             final var auctionId = getIntegerInput(context, "Enter the auction id:", true);
             if (hasUserTerminatedOperation(auctionId)) {
+                out.println(terminatedOperationText);
                 return Optional.empty();
             }
 
             if (state.hasAuction(auctionId)) {
-                final var auction = Optional.of(state.get(auctionId));
-
-                if (auction.isPresent() && auction.get().getSeller().equals(context.getCurrentUser().getUsername())) {
-                    return auction;
-                }
+                return Optional.of(state.get(auctionId));
             }
             out.println("Could not find auction. Please try again.");
         } while (true);
+    }
+
+    private Optional<Auction> getOwnAuction(final MenuContext context) {
+        final var auction = getAuction(context);
+
+        if (auction.isEmpty() || auction.get().getSeller().equals(context.getCurrentUser())) {
+            return auction;
+        } else {
+            context.getOut().println("Could not find auction. Please try again.");
+            return getOwnAuction(context);
+        }
+    }
+
+    private Optional<Auction> getBiddableAuction(final MenuContext context) {
+        final var auction = getAuction(context);
+
+        if (auction.isEmpty() || !auction.get().getSeller().equals(context.getCurrentUser())) {
+            return auction;
+        } else {
+            context.getOut().println("Could not find auction. Please try again.");
+            return getBiddableAuction(context);
+        }
     }
 }

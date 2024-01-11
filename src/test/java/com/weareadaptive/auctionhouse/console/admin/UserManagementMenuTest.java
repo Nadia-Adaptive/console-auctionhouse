@@ -1,10 +1,7 @@
 package com.weareadaptive.auctionhouse.console.admin;
 
 import com.weareadaptive.auctionhouse.console.MenuContext;
-import com.weareadaptive.auctionhouse.model.AuctionState;
-import com.weareadaptive.auctionhouse.model.ModelState;
-import com.weareadaptive.auctionhouse.model.OrganisationState;
-import com.weareadaptive.auctionhouse.model.UserState;
+import com.weareadaptive.auctionhouse.model.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,8 +12,8 @@ import java.util.Scanner;
 import java.util.stream.Stream;
 
 import static com.weareadaptive.auctionhouse.TestData.USER1;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.weareadaptive.auctionhouse.TestData.USER2;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserManagementMenuTest {
     private static Stream<Arguments> testArguments() {
@@ -50,7 +47,7 @@ public class UserManagementMenuTest {
         final UserManagementMenu menu = new UserManagementMenu();
         Scanner scanner = new Scanner(src);
         MenuContext context = new MenuContext(new ModelState(new UserState(), new OrganisationState(), new AuctionState()), scanner, System.out);
-        context.getState().userState().nextId();
+        context.getState().userState().add(USER2);
 
         menu.display(context);
 
@@ -72,7 +69,7 @@ public class UserManagementMenuTest {
         ));
 
 
-        assertTrue(context.getState().userState().stream().findAny().get().equals(USER1));
+        assertTrue(context.getState().userState().containsUser(USER1.getUsername()));
     }
 
     @Test
@@ -89,15 +86,21 @@ public class UserManagementMenuTest {
                 USER1.getOrganisation()
         ));
 
-
-        assertTrue(context.getState().userState().stream().findAny().get().equals(USER1));
+        assertTrue(context.getState().userState().containsUser(USER1.getUsername()));
     }
 
     @ParameterizedTest
     @DisplayName("Update User details operation should terminate if user enters Q at any stage")
-    @MethodSource("testArguments") // TODO: Look this up
+    @MethodSource("testArguments")
     public void createUserShouldTerminatesOnUserRequest(final String src) {
-        //Assert
         assertDoesNotThrow(() -> createUserContext(src));
+    }
+
+    @Test
+    @DisplayName("admin can change users access status")
+    public void adminCanChangeUserStatus() {
+        final MenuContext context = createUserContext("4\n%s\nblock\n7".formatted(USER2.getUsername()));
+
+        assertEquals(AccessStatus.BLOCKED, USER2.getAccessStatus());
     }
 }

@@ -101,13 +101,18 @@ public class Auction implements Model {
         if (bid.getPrice() < minPrice) {
             throw new BusinessException("Bid doesn't meet minimum price.");
         }
+
+        if(bid.getBuyer().equals(seller)){
+            throw new BusinessException("A seller cannot bid on their own auction.");
+
+        }
         bids.add(bid);
     }
 
     public void close() {
         bids.stream().sorted(Comparator.reverseOrder()).forEach(bid -> {
             if (totalQuantitySold < quantity) {
-                double fillQuantity = bid.getQuantity();
+                int fillQuantity = bid.getQuantity();
                 totalQuantitySold += fillQuantity;
 
                 if (totalQuantitySold > quantity) {
