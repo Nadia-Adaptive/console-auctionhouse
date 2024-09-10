@@ -8,7 +8,13 @@ import com.weareadaptive.auctionhouse.utils.StringUtil;
 
 import java.util.Optional;
 
-import static com.weareadaptive.auctionhouse.utils.PromptUtil.*;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.CANCEL_OPERATION_TEXT;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.INVALID_INPUT_MESSAGE;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.LEAVE_FIELD_BLANK_TEXT;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.TERMINATED_OPERATION_TEXT;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.getStringInput;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.getStringOrEmptyInput;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.hasUserTerminatedOperation;
 import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
 import static com.weareadaptive.auctionhouse.utils.StringUtil.organisationToString;
 
@@ -29,18 +35,18 @@ public class UserManagementMenu extends ConsoleMenu {
     private void changeUserAccess(final MenuContext context) {
         var out = context.getOut();
         printAllUsers(context);
-        out.println(cancelOperationText);
+        out.println(CANCEL_OPERATION_TEXT);
 
         var user = getUser(context);
         if (user.isEmpty()) {
-            out.println(terminatedOperationText);
+            out.println(TERMINATED_OPERATION_TEXT);
             return;
         }
 
         do {
             var input = getStringInput(context, "Please input allow or block to change the user's access.");
             if (hasUserTerminatedOperation(input)) {
-                out.println(terminatedOperationText);
+                out.println(TERMINATED_OPERATION_TEXT);
                 return;
             }
 
@@ -48,7 +54,7 @@ public class UserManagementMenu extends ConsoleMenu {
                 case "block" -> user.get().setAccessStatus(AccessStatus.BLOCKED);
                 case "allow" -> user.get().setAccessStatus(AccessStatus.ALLOWED);
                 default -> {
-                    out.println(invalidInputMessage);
+                    out.println(INVALID_INPUT_MESSAGE);
                     continue;
                 }
             }
@@ -60,17 +66,17 @@ public class UserManagementMenu extends ConsoleMenu {
     private void updateExistingUser(final MenuContext context) {
         final var out = context.getOut();
         printAllUsers(context);
-        out.println(cancelOperationText);
+        out.println(CANCEL_OPERATION_TEXT);
 
         final var user = getUser(context);
         if (user.isEmpty()) {
-            out.println(terminatedOperationText);
+            out.println(TERMINATED_OPERATION_TEXT);
             return;
         }
 
-        final String uName = getUsername(context, "What is the new username?\n%s".formatted(leaveFieldBlankText));
+        final String uName = getUsername(context, "What is the new username?\n%s".formatted(LEAVE_FIELD_BLANK_TEXT));
         final String fName = getStringOrEmptyInput(context, "What is the new first name?");
-        final String password = getPassword(context, "What is the new password?\n%s".formatted(leaveFieldBlankText));
+        final String password = getPassword(context, "What is the new password?\n%s".formatted(LEAVE_FIELD_BLANK_TEXT));
         final String lName = getStringOrEmptyInput(context, "What is new last name?");
         final String organisation = getStringOrEmptyInput(context, "What is the user's new organisation?");
         final String oldOrganisation = user.get().getOrganisation();
@@ -109,35 +115,35 @@ public class UserManagementMenu extends ConsoleMenu {
         var orgState = context.getState().organisationState();
         var out = context.getOut();
 
-        out.println(cancelOperationText);
+        out.println(CANCEL_OPERATION_TEXT);
 
         String uName = getUsername(context, "What is the user's username");
         if (hasUserTerminatedOperation(uName)) {
-            out.println(terminatedOperationText);
+            out.println(TERMINATED_OPERATION_TEXT);
             return;
         }
 
         String password = getPassword(context, "Enter the user's password");
         if (hasUserTerminatedOperation(password)) {
-            out.println(terminatedOperationText);
+            out.println(TERMINATED_OPERATION_TEXT);
             return;
         }
 
         String fName = getStringInput(context, "What is the user's first name?");
         if (hasUserTerminatedOperation(fName)) {
-            out.println(terminatedOperationText);
+            out.println(TERMINATED_OPERATION_TEXT);
             return;
         }
 
         String lName = getStringInput(context, "What is the user's last name?");
         if (hasUserTerminatedOperation(lName)) {
-            out.println(terminatedOperationText);
+            out.println(TERMINATED_OPERATION_TEXT);
             return;
         }
 
         final String organisation = getStringInput(context, "Where does the user work?");
         if (hasUserTerminatedOperation(organisation)) {
-            out.println(terminatedOperationText);
+            out.println(TERMINATED_OPERATION_TEXT);
             return;
         }
 
@@ -216,7 +222,7 @@ public class UserManagementMenu extends ConsoleMenu {
         pressEnter(context);
     }
 
-    private void printAllUsers(MenuContext context) {
+    private void printAllUsers(final MenuContext context) {
         final var userState = context.getState().userState();
         userState.stream().forEach(u -> context.getOut().println(StringUtil.userToString(u)));
     }

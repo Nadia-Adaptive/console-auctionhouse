@@ -6,7 +6,7 @@ import com.weareadaptive.auctionhouse.model.User;
 
 import java.util.Arrays;
 
-public class TestData {
+public final class TestData {
   public static final String ORG_1 = "Org 1";
   public static final String ORG_2 = "Org 2";
   public static final String AAPL = "AAPL";

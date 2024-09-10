@@ -4,8 +4,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static com.weareadaptive.auctionhouse.TestData.*;
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.Instant;
+
+import static com.weareadaptive.auctionhouse.TestData.AUCTION1;
+import static com.weareadaptive.auctionhouse.TestData.AUCTION2;
+import static com.weareadaptive.auctionhouse.TestData.AUCTION3;
+import static com.weareadaptive.auctionhouse.TestData.USER1;
+import static com.weareadaptive.auctionhouse.TestData.USER4;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AuctionStateTest {
     private static AuctionState state;
@@ -48,8 +56,8 @@ public class AuctionStateTest {
     @Test
     @DisplayName("getAuctionsUserBidOn returns all the auctions the user's bid on")
     public void getAuctionsUserHasBidOn() {
-        final var bid01 = new Bid(USER1, 12, 10);
-        final var bid02 = new Bid(USER1, 12, 10);
+        final var bid01 = new Bid(USER1, 12, 10, Instant.now());
+        final var bid02 = new Bid(USER1, 12, 10, Instant.now());
 
         state.add(AUCTION2);
 

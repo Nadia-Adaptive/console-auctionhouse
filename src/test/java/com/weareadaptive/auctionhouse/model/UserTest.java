@@ -9,10 +9,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserTest {
-
     private static Stream<Arguments> createUserArguments() {
         return Stream.of(
                 Arguments.of("username",
@@ -30,8 +32,8 @@ public class UserTest {
 
     @ParameterizedTest(name = "Create user should throw when {0} is null")
     @MethodSource("createUserArguments")
-    public void createUserShouldThrowWhenNullProperty(String propertyName,
-                                                      Executable userExecutable) {
+    public void createUserShouldThrowWhenNullProperty(final String propertyName,
+                                                      final Executable userExecutable) {
         //Act
         var exception = assertThrows(BusinessException.class, userExecutable);
 
@@ -42,26 +44,20 @@ public class UserTest {
     @Test
     @DisplayName("ValidatePassword should return false when the password is not valid")
     public void shouldReturnFalseWhenThePasswordIsNotValid() {
-        //Arrange
-        var user = new User(1, "test", "thepassword", "Jonh", "Doe", "Adaptive");
+        final var user = new User(1, "test", "thepassword", "Jonh", "Doe", "Adaptive");
 
-        //Act
-        var result = user.validatePassword("bad");
+        final var result = user.validatePassword("bad");
 
-        //Assert
         assertFalse(result);
     }
 
     @Test
     @DisplayName("ValidatePassword should return true when the password is valid")
     public void shouldReturnTrueWhenThePasswordIsValid() {
-        //Arrange
-        var user = new User(1, "test", "thepassword", "Jonh", "Doe", "Adaptive");
+        final var user = new User(1, "test", "thepassword", "Jonh", "Doe", "Adaptive");
 
-        //Act
-        var result = user.validatePassword("thepassword");
+        final var result = user.validatePassword("thepassword");
 
-        //Assert
         assertTrue(result);
     }
 
@@ -91,6 +87,6 @@ public class UserTest {
     public void userDefaultStatusIsAllowed() {
         final var user = new User(1, "test", "thepassword", "Jonh", "Doe", "Adaptive");
 
-        assertEquals(AccessStatus.ALLOWED,  user.getAccessStatus());
+        assertEquals(AccessStatus.ALLOWED, user.getAccessStatus());
     }
 }

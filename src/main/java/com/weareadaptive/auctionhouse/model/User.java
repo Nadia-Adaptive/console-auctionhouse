@@ -14,13 +14,15 @@ public class User implements Model {
     private final boolean isAdmin;
     private AccessStatus accessStatus;
 
-    public User(int id, String username, String password, String firstName, String lastName,
-                String organisation) {
+    public User(final int id, final String username, final String password, final String firstName,
+                final String lastName,
+                final String organisation) {
         this(id, username, password, firstName, lastName, organisation, false);
     }
 
-    public User(int id, String username, String password, String firstName, String lastName,
-                String organisation, boolean isAdmin) {
+    public User(final int id, final String username, final String password, final String firstName,
+                final String lastName,
+                final String organisation, final boolean isAdmin) {
         if (isNullOrEmpty(username)) {
             throw new BusinessException("username cannot be null or empty");
         }
@@ -50,7 +52,7 @@ public class User implements Model {
         return username;
     }
 
-    public boolean validatePassword(String password) {
+    public boolean validatePassword(final String password) {
         return this.password.equals(password);
     }
 
@@ -78,15 +80,19 @@ public class User implements Model {
         return accessStatus;
     }
 
-    public void setAccessStatus(AccessStatus accessStatus) {
+    public void setAccessStatus(final AccessStatus accessStatus) {
         this.accessStatus = accessStatus;
     }
 
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         User user = (User) o;
         return getId() == user.getId() && getUsername().equals(user.getUsername());
     }
@@ -96,7 +102,8 @@ public class User implements Model {
         return Objects.hash(getId(), getUsername());
     }
 
-    public void update(String username, String password, String firstName, String lastName, String organisation) {
+    public void update(final String username, final String password, final String firstName, final String lastName,
+                       final String organisation) {
         this.username = isNullOrEmpty(username) ? this.username : username;
         this.password = isNullOrEmpty(password) ? this.password : password;
         this.firstName = isNullOrEmpty(firstName) ? this.firstName : firstName;

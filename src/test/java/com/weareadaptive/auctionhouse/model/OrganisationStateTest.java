@@ -4,9 +4,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static com.weareadaptive.auctionhouse.TestData.*;
+import static com.weareadaptive.auctionhouse.TestData.ADMIN;
+import static com.weareadaptive.auctionhouse.TestData.ORG_1;
+import static com.weareadaptive.auctionhouse.TestData.USER1;
+import static com.weareadaptive.auctionhouse.TestData.USER2;
+import static com.weareadaptive.auctionhouse.TestData.USER3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OrganisationStateTest {
     private OrganisationState state;
@@ -44,15 +50,12 @@ public class OrganisationStateTest {
     @Test
     @DisplayName("removeUserFromOrganisation should remove existing user from specified organisation")
     public void removeExistingUserFromOrganisation() {
-        final var organisation = state.getAllDetails().findFirst().get();
-        assertEquals(true, state.removeUserFromOrganisation(USER1, ORG_1));
+        assertTrue(state.removeUserFromOrganisation(USER1, ORG_1));
     }
 
     @Test
     @DisplayName("removeUserFromOrganisation should remove existing user from specified organisation")
     public void doNothingIfUserDoesntExist() {
-        final var organisation = state.getAllDetails().findFirst().get();
-        assertEquals(false,  state.removeUserFromOrganisation(new User(15, "test", "password", "t", "t", "t")
-                , ORG_1));
+        assertFalse(state.removeUserFromOrganisation(new User(15, "test", "password", "t", "t", "t"), ORG_1));
     }
 }

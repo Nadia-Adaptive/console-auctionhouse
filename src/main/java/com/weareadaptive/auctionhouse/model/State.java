@@ -5,43 +5,43 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class State<T extends Model> {
-  public static final String ITEM_ALREADY_EXISTS = "Item already exists";
-  private final Map<Integer, T> models;
-  private int currentId = 0;
+    public static final String ITEM_ALREADY_EXISTS = "Item already exists";
+    private final Map<Integer, T> models;
+    private int currentId = 0;
 
-  public State() {
-    models = new HashMap<>();
-  }
-
-  public int nextId() {
-    return currentId++;
-  }
-
-  protected void onAdd(T model) {
-
-  }
-
-  public void add(T model) {
-    if (models.containsKey(model.getId())) {
-      throw new BusinessException(ITEM_ALREADY_EXISTS);
+    public State() {
+        models = new HashMap<>();
     }
-    onAdd(model);
-    models.put(model.getId(), model);
-  }
 
-  void setNextId(int id) {
-    this.currentId = id;
-  }
+    public int nextId() {
+        return currentId++;
+    }
 
-  public T get(int id) {
-    return models.get(id);
-  }
+    protected void onAdd(final T model) {
 
-  public Stream<T> stream() {
-    return models.values().stream();
-  }
+    }
 
-  protected void update(int id, T newModel){
-    models.replace(id, newModel);
-  }
+    public void add(final T model) {
+        if (models.containsKey(model.getId())) {
+            throw new BusinessException(ITEM_ALREADY_EXISTS);
+        }
+        onAdd(model);
+        models.put(model.getId(), model);
+    }
+
+    void setNextId(final int id) {
+        this.currentId = id;
+    }
+
+    public T get(final int id) {
+        return models.get(id);
+    }
+
+    public Stream<T> stream() {
+        return models.values().stream();
+    }
+
+    protected void update(final int id, final T newModel) {
+        models.replace(id, newModel);
+    }
 }

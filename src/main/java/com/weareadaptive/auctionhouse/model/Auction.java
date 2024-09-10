@@ -2,7 +2,9 @@ package com.weareadaptive.auctionhouse.model;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
@@ -20,8 +22,8 @@ public class Auction implements Model {
 
 
     private int totalQuantitySold;
-    final private List<Bid> winningBids;
-    final private List<Bid> losingBids;
+    private final List<Bid> winningBids;
+    private final List<Bid> losingBids;
 
     public Auction(final int id, final User seller, final String symbol, final double minPrice, final int quantity) {
         if (isNullOrEmpty(symbol)) {
@@ -102,7 +104,7 @@ public class Auction implements Model {
             throw new BusinessException("Bid doesn't meet minimum price.");
         }
 
-        if(bid.getBuyer().equals(seller)){
+        if (bid.getBuyer().equals(seller)) {
             throw new BusinessException("A seller cannot bid on their own auction.");
 
         }
@@ -121,28 +123,25 @@ public class Auction implements Model {
                 }
                 bid.fillBid(fillQuantity);
 
-                totalRevenue = totalRevenue.add(BigDecimal.valueOf(bid.getPrice()).multiply(BigDecimal.valueOf(fillQuantity)));
+                totalRevenue =
+                        totalRevenue.add(BigDecimal.valueOf(bid.getPrice()).multiply(BigDecimal.valueOf(fillQuantity)));
                 winningBids.add(bid);
             } else {
                 bid.fillBid(0);
                 losingBids.add(bid);
             }
         });
-        // TODO: Search for, and possibly eliminate, any toList
+
         this.auctionStatus = AuctionStatus.CLOSED;
     }
 
-    public Boolean hasUserBid(String username) {
+    public Boolean hasUserBid(final String username) {
         return bids.stream().anyMatch(b -> b.getBuyer().getUsername().equals(username));
     }
 
     @Override
     public String toString() {
-        return "Auction{" +
-                "id=" + id +
-                ", symbol='" + symbol + '\'' +
-                ", seller='" + seller + '\'' +
-                '}';
+        return "Auction{id=%d, symbol='%s', seller='%s'}".formatted(id, symbol, seller);
     }
 
     public Stream<Bid> getLosingBids() {

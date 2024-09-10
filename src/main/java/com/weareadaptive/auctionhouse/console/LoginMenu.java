@@ -6,8 +6,8 @@ import com.weareadaptive.auctionhouse.model.AccessStatus;
 
 public class LoginMenu extends ConsoleMenu {
 
-    final private UserManagementMenu userMenu;
-    final private AuctionManagementMenu auctionMenu;
+    private final UserManagementMenu userMenu;
+    private final AuctionManagementMenu auctionMenu;
 
     public LoginMenu() {
         userMenu = new UserManagementMenu();
@@ -15,7 +15,7 @@ public class LoginMenu extends ConsoleMenu {
     }
 
     @Override
-    public void display(MenuContext context) {
+    public void display(final MenuContext context) {
         createMenu(
                 context,
                 option("Login", this::login),
@@ -23,7 +23,7 @@ public class LoginMenu extends ConsoleMenu {
         );
     }
 
-    private void login(MenuContext context) {
+    private void login(final MenuContext context) {
         var out = context.getOut();
 
         out.println("Enter your username:");
@@ -40,14 +40,14 @@ public class LoginMenu extends ConsoleMenu {
                     context.setCurrentUser(user);
                     if (user.getAccessStatus() == AccessStatus.ALLOWED) {
                         out.printf("Welcome %s %s %n", user.getFirstName(), user.getLastName());
-                        ManagementMenu(context);
+                        createManagementMenus(context);
                     } else {
                         out.println("You are not authorized. Please contact support.");
                     }
                 }, () -> out.println("Invalid username/password combination"));
     }
 
-    private void ManagementMenu(MenuContext context) {
+    private void createManagementMenus(final MenuContext context) {
         createMenu(
                 context,
                 option("User management", this::userManagementMenu, (c) -> c.getCurrentUser().isAdmin()),
@@ -56,11 +56,11 @@ public class LoginMenu extends ConsoleMenu {
         );
     }
 
-    private void userManagementMenu(MenuContext context) {
+    private void userManagementMenu(final MenuContext context) {
         userMenu.display(context);
     }
 
-    private void auctionManagementMenu(MenuContext context) {
+    private void auctionManagementMenu(final MenuContext context) {
         auctionMenu.display(context);
     }
 }

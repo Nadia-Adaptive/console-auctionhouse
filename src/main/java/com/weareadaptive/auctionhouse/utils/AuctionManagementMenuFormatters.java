@@ -40,16 +40,18 @@ public class AuctionManagementMenuFormatters {
                 ========================================
                 Id: %d%nSymbol: %s%nStatus: %s%nAll Bids: \n%s
                 ========================================
-                Total revenue: %.3f\nTotal Quantity Sold: %d\n==============\nWinning bids:\n%s\n""".formatted(auction.getId(),
+                Total revenue: %.3f\nTotal Quantity Sold: %d\n==============\nWinning bids:\n%s\n""".formatted(
+                auction.getId(),
                 auction.getSymbol(),
                 auction.getStatus().toString(),
                 auction.getBids()
                         .map(AuctionManagementMenuFormatters::formatSellerBidEntry)
                         .reduce((String acc, String val) -> String.join("\n", acc, val)
                         ).orElse(""), auction.getTotalRevenue(), auction.getTotalQuantitySold(),
-                auction.getWinningBids().map(b -> "\tUser: %s\n\tTotal quantity filled: %d\n\tPrice: %.3f".formatted(b.getBuyer().getUsername(),
+                auction.getWinningBids().map(b -> "\tUser: %s\n\tTotal quantity filled: %d\n\tPrice: %.3f".formatted(
+                                b.getBuyer().getUsername(),
                                 b.getQuantityFilled(), b.getPrice()))
                         .reduce((String acc, String val) -> String.join("\n", acc, val)
-                ).orElse(""));
+                        ).orElse(""));
     }
 }

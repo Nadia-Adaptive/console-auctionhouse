@@ -8,12 +8,23 @@ import com.weareadaptive.auctionhouse.model.Bid;
 
 import java.util.Optional;
 
-import static com.weareadaptive.auctionhouse.utils.AuctionManagementMenuFormatters.*;
-import static com.weareadaptive.auctionhouse.utils.PromptUtil.*;
+import static com.weareadaptive.auctionhouse.utils.AuctionManagementMenuFormatters.formatAuctionEntry;
+import static com.weareadaptive.auctionhouse.utils.AuctionManagementMenuFormatters.formatBuyerBidEntry;
+import static com.weareadaptive.auctionhouse.utils.AuctionManagementMenuFormatters.formatClosedAuctionSummary;
+import static com.weareadaptive.auctionhouse.utils.AuctionManagementMenuFormatters.formatOpenAuctionSummary;
+import static com.weareadaptive.auctionhouse.utils.AuctionManagementMenuFormatters.formatSellerBidEntry;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.CANCEL_OPERATION_TEXT;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.getDoubleInput;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.getIntegerInput;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.getStringInput;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.hasUserTerminatedOperation;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.INVALID_INPUT_MESSAGE;
+import static com.weareadaptive.auctionhouse.utils.PromptUtil.TERMINATED_OPERATION_TEXT;
+
 
 public class AuctionManagementMenu extends ConsoleMenu {
     @Override
-    public void display(MenuContext context) {
+    public void display(final MenuContext context) {
         createMenu(context,
                 option("Create an auction", this::createAuction),
                 option("See your auctions", this::listUserAuctions),
@@ -29,23 +40,23 @@ public class AuctionManagementMenu extends ConsoleMenu {
         final var auctionState = context.getState().auctionState();
         final var out = context.getOut();
 
-        out.println(cancelOperationText);
+        out.println(CANCEL_OPERATION_TEXT);
 
         final String symbol = getStringInput(context, "What is the product's symbol?");
         if (hasUserTerminatedOperation(symbol)) {
-            out.println(terminatedOperationText);
+            out.println(TERMINATED_OPERATION_TEXT);
             return;
         }
 
         final double price = getDoubleInput(context, "Enter the minimum asking price.");
         if (hasUserTerminatedOperation(price)) {
-            out.println(terminatedOperationText);
+            out.println(TERMINATED_OPERATION_TEXT);
             return;
         }
 
         final int quantity = getIntegerInput(context, "How much %s are you selling?".formatted(symbol));
         if (hasUserTerminatedOperation(quantity)) {
-            out.println(terminatedOperationText);
+            out.println(TERMINATED_OPERATION_TEXT);
             return;
         }
 
@@ -59,7 +70,8 @@ public class AuctionManagementMenu extends ConsoleMenu {
 
     private void listUserAuctions(final MenuContext context) {
         final var out = context.getOut();
-        final var allAuctions = context.getState().auctionState().getUserAuctions(context.getCurrentUser().getUsername());
+        final var allAuctions =
+                context.getState().auctionState().getUserAuctions(context.getCurrentUser().getUsername());
 
         out.println("=====> Your Auctions");
         out.println("===================================");
@@ -78,7 +90,7 @@ public class AuctionManagementMenu extends ConsoleMenu {
         final var out = context.getOut();
 
         out.println("\n=====> Close an Auction");
-        out.println(cancelOperationText);
+        out.println(CANCEL_OPERATION_TEXT);
         out.println("Here are all your open auctions");
 
         out.println("==============================================");
@@ -98,7 +110,8 @@ public class AuctionManagementMenu extends ConsoleMenu {
         out.println("Do you wish to close it?");
 
         do {
-            final var isClosed = getStringInput(context, "Enter yes to close the auction or no to cancel the operation.");
+            final var isClosed =
+                    getStringInput(context, "Enter yes to close the auction or no to cancel the operation.");
 
             switch (isClosed.toLowerCase()) {
                 case "yes" -> {
@@ -107,10 +120,10 @@ public class AuctionManagementMenu extends ConsoleMenu {
                     return;
                 }
                 case "no" -> {
-                    out.println(cancelOperationText);
+                    out.println(CANCEL_OPERATION_TEXT);
                     return;
                 }
-                default -> out.println(invalidInputMessage);
+                default -> out.println(INVALID_INPUT_MESSAGE);
             }
         } while (true);
     }
@@ -119,6 +132,7 @@ public class AuctionManagementMenu extends ConsoleMenu {
         final var out = context.getOut();
         final var auctionState = context.getState().auctionState();
         final var user = context.getCurrentUser();
+        final var timeContext = context.getTimeContext();
 
         if (auctionState.stream().findAny().isEmpty()) {
             out.println("There are no open auctions right now. Please try again later.");
@@ -131,7 +145,7 @@ public class AuctionManagementMenu extends ConsoleMenu {
         auctionState.getAvailableAuctions(user.getUsername())
                 .forEach(a -> out.println(formatAuctionEntry(a)));
 
-        out.println(cancelOperationText);
+        out.println(CANCEL_OPERATION_TEXT);
 
         final var auction = getBiddableAuction(context);
 
@@ -150,7 +164,7 @@ public class AuctionManagementMenu extends ConsoleMenu {
             return;
         }
 
-        final var bid = new Bid(user, price, quantity);
+        final var bid = new Bid(user, price, quantity, timeContext.getNow());
         auction.get().placeABid(bid);
         out.println("Bid created");
         pressEnter(context);
@@ -180,13 +194,14 @@ public class AuctionManagementMenu extends ConsoleMenu {
         out.println("Here are your losing bids.\n=======");
 
         auctions.forEach(a ->
-                a.getLosingBids().forEach(b -> out.println("\t%s\n".formatted(formatBuyerBidEntry(a, b)))
+                a.getLosingBids().forEach(b -> out.println((formatBuyerBidEntry(a, b)))
                 ));
     }
 
     private double getOfferPrice(final MenuContext context, final Auction auction) {
         do {
-            double offer = getDoubleInput(context, "Enter your offer (min amount is %.2f):".formatted(auction.getMinPrice()));
+            double offer =
+                    getDoubleInput(context, "Enter your offer (min amount is %.2f):".formatted(auction.getMinPrice()));
 
             if (offer > auction.getMinPrice()) {
                 return offer;
@@ -200,7 +215,7 @@ public class AuctionManagementMenu extends ConsoleMenu {
         do {
             final var auctionId = getIntegerInput(context, "Enter the auction id:", true);
             if (hasUserTerminatedOperation(auctionId)) {
-                out.println(terminatedOperationText);
+                out.println(TERMINATED_OPERATION_TEXT);
                 return Optional.empty();
             }
 

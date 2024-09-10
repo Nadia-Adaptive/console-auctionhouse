@@ -1,7 +1,13 @@
 package com.weareadaptive.auctionhouse.console.admin;
 
 import com.weareadaptive.auctionhouse.console.MenuContext;
-import com.weareadaptive.auctionhouse.model.*;
+import com.weareadaptive.auctionhouse.model.AccessStatus;
+import com.weareadaptive.auctionhouse.model.AuctionState;
+import com.weareadaptive.auctionhouse.model.InstantTimeProvider;
+import com.weareadaptive.auctionhouse.model.ModelState;
+import com.weareadaptive.auctionhouse.model.OrganisationState;
+import com.weareadaptive.auctionhouse.model.TimeContext;
+import com.weareadaptive.auctionhouse.model.UserState;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,8 +17,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
-import static com.weareadaptive.auctionhouse.TestData.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.weareadaptive.auctionhouse.TestData.USER1;
+import static com.weareadaptive.auctionhouse.TestData.USER2;
+import static com.weareadaptive.auctionhouse.TestData.USER3;
+import static com.weareadaptive.auctionhouse.TestData.USER4;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserManagementMenuTest {
     private static Stream<Arguments> testArguments() {
@@ -45,7 +56,9 @@ public class UserManagementMenuTest {
     private MenuContext createUserContext(final String src) {
         final UserManagementMenu menu = new UserManagementMenu();
         Scanner scanner = new Scanner(src);
-        MenuContext context = new MenuContext(new ModelState(new UserState(), new OrganisationState(), new AuctionState()), scanner, System.out);
+        MenuContext context =
+                new MenuContext(new ModelState(new UserState(), new OrganisationState(), new AuctionState()), scanner,
+                        System.out, new TimeContext(new InstantTimeProvider()));
         context.getState().userState().add(USER2);
         context.getState().userState().add(USER3);
         context.getState().userState().add(USER4);
@@ -72,7 +85,6 @@ public class UserManagementMenuTest {
                 USER1.getLastName(),
                 USER1.getOrganisation()
         ));
-
 
         assertTrue(context.getState().userState().containsUser(USER1.getUsername()));
     }
@@ -104,25 +116,26 @@ public class UserManagementMenuTest {
     @Test
     @DisplayName("admin can change users access status")
     public void adminCanChangeUserStatus() {
-        assertDoesNotThrow(()->createUserContext("4\n%s\nblock\n7".formatted(USER2.getUsername())));
+        assertDoesNotThrow(() -> createUserContext("4\n%s\nblock\n7".formatted(USER2.getUsername())));
 
         assertEquals(AccessStatus.BLOCKED, USER2.getAccessStatus());
     }
+
     @Test
     @DisplayName("admin can view users information")
     public void adminCanViewUserInformation() {
-        assertDoesNotThrow(()->createUserContext("2\n\r7"));
+        assertDoesNotThrow(() -> createUserContext("2\n\r7"));
     }
 
     @Test
     @DisplayName("admin can get view all organisations")
     public void adminCanViewAllOrganisations() {
-        assertDoesNotThrow(()->createUserContext("5\n\r7"));
+        assertDoesNotThrow(() -> createUserContext("5\n\r7"));
     }
 
     @Test
     @DisplayName("admin can get view all organisations details")
     public void adminCanViewOrganisationDetails() {
-        assertDoesNotThrow(()->createUserContext("6\n\r7"));
+        assertDoesNotThrow(() -> createUserContext("6\n\r7"));
     }
 }

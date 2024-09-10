@@ -1,22 +1,22 @@
 package com.weareadaptive.auctionhouse.console;
 
-public class Parser {
+public final class Parser {
 
   private Parser() {
   }
 
-  public static int parseInt(String value, String property) throws ParsingException {
+  public static int parseInt(final String value, final String property) throws ParsingException {
     try {
       return Integer.parseInt(value);
-    } catch (NumberFormatException exception) {
+    } catch (final NumberFormatException exception) {
       throw new ParsingException(property, "Integer");
     }
   }
 
-  public static double parseDouble(String value, String property) throws ParsingException {
+  public static double parseDouble(final String value, final String property) throws ParsingException {
     try {
       return Double.parseDouble(value);
-    } catch (NumberFormatException exception) {
+    } catch (final NumberFormatException exception) {
       throw new ParsingException(property, "Double");
     }
   }

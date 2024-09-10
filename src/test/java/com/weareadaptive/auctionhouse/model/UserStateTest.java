@@ -6,8 +6,14 @@ import org.junit.jupiter.api.Test;
 
 import java.util.stream.Stream;
 
-import static com.weareadaptive.auctionhouse.TestData.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.weareadaptive.auctionhouse.TestData.ADMIN;
+import static com.weareadaptive.auctionhouse.TestData.USER1;
+import static com.weareadaptive.auctionhouse.TestData.USER2;
+import static com.weareadaptive.auctionhouse.TestData.USER3;
+import static com.weareadaptive.auctionhouse.TestData.USER4;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserStateTest {
     private UserState state;

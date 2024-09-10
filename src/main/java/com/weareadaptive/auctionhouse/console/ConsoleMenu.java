@@ -9,29 +9,29 @@ public abstract class ConsoleMenu {
 
     public abstract void display(MenuContext context);
 
-    protected MenuOption option(String title, Consumer<MenuContext> action) {
+    protected MenuOption option(final String title, final Consumer<MenuContext> action) {
         return new MenuOption(title, action, c -> true);
     }
 
-    protected MenuOption option(String title, Runnable action) {
+    protected MenuOption option(final String title, final Runnable action) {
         return new MenuOption(title, c -> action.run(), c -> true);
     }
 
-    protected MenuOption option(String title, Consumer<MenuContext> action,
-                                Predicate<MenuContext> isShown) {
+    protected MenuOption option(final String title, final Consumer<MenuContext> action,
+                                final Predicate<MenuContext> isShown) {
         return new MenuOption(title, action, isShown);
     }
 
-    protected MenuOption option(String title, Runnable action, Predicate<MenuContext> isDisplayed) {
+    protected MenuOption option(final String title, final Runnable action, final Predicate<MenuContext> isDisplayed) {
         return new MenuOption(title, c -> action.run(), isDisplayed);
     }
 
-    protected MenuOption leave(String title) {
+    protected MenuOption leave(final String title) {
         return new MenuOption(title, c -> {
         }, c -> true, true);
     }
 
-    protected void createMenu(MenuContext context, MenuOption... options) {
+    protected void createMenu(final MenuContext context, final MenuOption... options) {
         var scanner = context.getScanner();
         var out = context.getOut();
 
@@ -56,7 +56,7 @@ public abstract class ConsoleMenu {
                 } else {
                     invalidOption = true;
                 }
-            } catch (InputMismatchException | NumberFormatException mismatchException) {
+            } catch (final InputMismatchException | NumberFormatException mismatchException) {
                 invalidOption = true;
             }
             if (invalidOption) {
@@ -65,12 +65,12 @@ public abstract class ConsoleMenu {
         }
     }
 
-    protected void pressEnter(MenuContext context) {
+    protected void pressEnter(final MenuContext context) {
         context.getOut().println("Press Enter key to continue...");
         context.getScanner().nextLine();
     }
 
-    protected String readPassword(Scanner scanner) {
+    protected String readPassword(final Scanner scanner) {
         if (System.console() != null) {
             return new String(System.console().readPassword());
         } else {
@@ -79,19 +79,19 @@ public abstract class ConsoleMenu {
         }
     }
 
-    public static class MenuOption {
+    public static final class MenuOption {
         final String title;
         final Consumer<MenuContext> action;
         final boolean leave;
         private final Predicate<MenuContext> isDisplayed;
 
-        private MenuOption(String title, Consumer<MenuContext> action,
-                           Predicate<MenuContext> isDisplayed) {
+        private MenuOption(final String title, final Consumer<MenuContext> action,
+                           final Predicate<MenuContext> isDisplayed) {
             this(title, action, isDisplayed, false);
         }
 
-        private MenuOption(String title, Consumer<MenuContext> action,
-                           Predicate<MenuContext> isDisplayed, boolean leave) {
+        private MenuOption(final String title, final Consumer<MenuContext> action,
+                           final Predicate<MenuContext> isDisplayed, final boolean leave) {
             this.isDisplayed = isDisplayed;
             this.leave = leave;
             this.title = title;

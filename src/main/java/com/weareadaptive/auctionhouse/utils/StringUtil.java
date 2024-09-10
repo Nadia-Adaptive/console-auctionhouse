@@ -4,11 +4,11 @@ import com.weareadaptive.auctionhouse.model.AccessStatus;
 import com.weareadaptive.auctionhouse.model.OrganisationDetails;
 import com.weareadaptive.auctionhouse.model.User;
 
-public class StringUtil {
+public final class StringUtil {
     private StringUtil() {
     }
 
-    public static boolean isNullOrEmpty(String theString) {
+    public static boolean isNullOrEmpty(final String theString) {
         return theString == null || theString.isBlank();
     }
 
@@ -21,7 +21,7 @@ public class StringUtil {
                 user.getAccessStatus() == AccessStatus.ALLOWED ? "Yes" : "No");
     }
 
-    public static String organisationToString(OrganisationDetails organisation) {
+    public static String organisationToString(final OrganisationDetails organisation) {
         return "Organisation: %s%n%s".formatted(
                 organisation.organisationName(),
                 organisation.users().stream()

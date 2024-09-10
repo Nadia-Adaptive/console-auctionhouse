@@ -1,37 +1,50 @@
 package com.weareadaptive.auctionhouse.console.auction;
 
 import com.weareadaptive.auctionhouse.console.MenuContext;
-import com.weareadaptive.auctionhouse.model.*;
+import com.weareadaptive.auctionhouse.model.Auction;
+import com.weareadaptive.auctionhouse.model.AuctionState;
+import com.weareadaptive.auctionhouse.model.AuctionStatus;
+import com.weareadaptive.auctionhouse.model.Bid;
+import com.weareadaptive.auctionhouse.model.InstantTimeProvider;
+import com.weareadaptive.auctionhouse.model.ModelState;
+import com.weareadaptive.auctionhouse.model.OrganisationState;
+import com.weareadaptive.auctionhouse.model.TimeContext;
+import com.weareadaptive.auctionhouse.model.UserState;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Scanner;
 
-import static com.weareadaptive.auctionhouse.TestData.*;
+import static com.weareadaptive.auctionhouse.TestData.USER1;
+import static com.weareadaptive.auctionhouse.TestData.USER2;
+import static com.weareadaptive.auctionhouse.TestData.USER3;
+import static com.weareadaptive.auctionhouse.TestData.USER4;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AuctionManagementMenuTest {
-    private static MenuContext createContext(final String src, final Optional<AuctionState> auctionState){
+    private static MenuContext createContext(final String src, final Optional<AuctionState> auctionState) {
         final AuctionManagementMenu menu = new AuctionManagementMenu();
         Scanner scanner = new Scanner(src);
         MenuContext context = new MenuContext(new ModelState(new UserState(), new OrganisationState(),
-                auctionState.orElse(new AuctionState())), scanner, System.out);
+                auctionState.orElse(new AuctionState())), scanner, System.out, new TimeContext(new InstantTimeProvider()));
         context.setCurrentUser(USER1);
 
         menu.display(context);
 
         return context;
     }
+
     public static MenuContext createTwoOpenAuctions(final String src) {
         final var auctionState = new AuctionState();
         auctionState.add(new Auction(auctionState.nextId(), USER2, "MSFT", 1.03d, 100));
         auctionState.add(new Auction(auctionState.nextId(), USER2, "APPL", 1.05d, 100));
 
-        auctionState.get(0).placeABid(new Bid(USER1, 1.2d, 80));
-        auctionState.get(0).placeABid(new Bid(USER1, 1.2d, 40));
-        auctionState.get(0).placeABid(new Bid(USER1, 1.1d, 10));
+        auctionState.get(0).placeABid(new Bid(USER1, 1.2d, 80, Instant.ofEpochSecond(1000)));
+        auctionState.get(0).placeABid(new Bid(USER1, 1.2d, 40, Instant.ofEpochSecond(900)));
+        auctionState.get(0).placeABid(new Bid(USER1, 1.1d, 10, Instant.ofEpochSecond(100)));
 
         auctionState.get(0).close();
 
@@ -43,8 +56,8 @@ public class AuctionManagementMenuTest {
         auctionState.add(new Auction(auctionState.nextId(), USER1, "JAGU", 1.02d, 100));
         auctionState.add(new Auction(auctionState.nextId(), USER1, "FORD", 1.02d, 100));
 
-        auctionState.get(0).placeABid(new Bid(USER3, 1.2d, 40));
-        auctionState.get(0).placeABid(new Bid(USER4, 1.1d, 10));
+        auctionState.get(0).placeABid(new Bid(USER3, 1.2d, 40, Instant.ofEpochSecond(100)));
+        auctionState.get(0).placeABid(new Bid(USER4, 1.1d, 10, Instant.ofEpochSecond(100)));
 
         return createContext(src, Optional.of((auctionState)));
     }
@@ -118,6 +131,6 @@ public class AuctionManagementMenuTest {
     @Test
     @DisplayName("auctionManagementMenu displays all a user's winning bids")
     public void displayUsersWonBids() {
-        assertDoesNotThrow(() ->  createTwoOpenAuctions("5\n\r7"));
+        assertDoesNotThrow(() -> createTwoOpenAuctions("5\n\r7"));
     }
 }

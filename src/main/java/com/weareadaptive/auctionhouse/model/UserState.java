@@ -11,7 +11,7 @@ public class UserState extends State<User> {
         usernameIndex = new HashMap<>();
     }
 
-    public Optional<User> findUserByUsername(String username, String password) {
+    public Optional<User> findUserByUsername(final String username, final String password) {
         return stream()
                 .filter(user -> user.getUsername().equalsIgnoreCase(username))
                 .filter(user -> user.validatePassword(password))
@@ -19,12 +19,12 @@ public class UserState extends State<User> {
     }
 
     @Override
-    protected void onAdd(User model) {
+    protected void onAdd(final User model) {
         super.onAdd(model);
         usernameIndex.put(model.getUsername(), get(model.getId()));
     }
 
-    public boolean containsUser(String uName) {
+    public boolean containsUser(final String uName) {
         return usernameIndex.containsKey(uName);
     }
 }

@@ -26,7 +26,7 @@ public class StringUtilTest {
 
     @ParameterizedTest(name = "{0} should return {1}")
     @MethodSource("testArguments")
-    public void shouldTestStringIsNotNullOrBlank(String input, boolean expectedResult) {
+    public void shouldTestStringIsNotNullOrBlank(final String input, final boolean expectedResult) {
         assertEquals(expectedResult, StringUtil.isNullOrEmpty(input));
     }
 
@@ -37,10 +37,10 @@ public class StringUtilTest {
                 StringUtil.userToString(USER1));
     }
 
-  @Test
-  @DisplayName("should display organisation info in a particular format")
-  public void shouldDisplayOrganisationInfoInAParticularFormat() {
-    assertEquals("Organisation: Org 1\n"+"Username: testuser1".indent(2),
-            StringUtil.organisationToString(ORGANISATION1));
-  }
+    @Test
+    @DisplayName("should display organisation info in a particular format")
+    public void shouldDisplayOrganisationInfoInAParticularFormat() {
+        assertEquals("Organisation: Org 1\n" + "Username: testuser1".indent(2),
+                StringUtil.organisationToString(ORGANISATION1));
+    }
 }
